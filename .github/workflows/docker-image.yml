@@ -60,7 +60,7 @@ jobs:
       #     chmod 600 ~/.ssh/id_rsa
 
       #     # 将 JAR 文件上传到服务器
-      #     scp -o StrictHostKeyChecking=no $JAR_PATH $SERVER_USER@$SERVER_HOST:/home/$SERVER_USER/$PROJECT_NAME.jar
+      #     scp -o StrictHostKeyChecking=no $JAR_PATH $SERVER_USER@$SERVER_HOST:/root/$PROJECT_NAME.jar
 
       #     # 在服务器上启动/重启应用
       #     ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
@@ -85,18 +85,24 @@ jobs:
         
       - name: multiple command
         uses: appleboy/ssh-action@master
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.KEY }}
+          SERVER_HOST: ${{ secrets.HOST }}
+          SERVER_USER: ${{ secrets.USERNAME }}
+          PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
+          JAR_PATH: "./target/ruoyi-wms-5.2.0.jar" # 替换为实际的 JAR 路径
         with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
+          host: $SERVER_HOST
+          username: $SERVER_USER
+          key: $SSH_PRIVATE_KEY
           port: 51268
           script_stop: true
           sync: true
           script: |
-            scp -o StrictHostKeyChecking=no $JAR_PATH $SERVER_USER@$SERVER_HOST:/home/$SERVER_USER/$PROJECT_NAME.jar
-            ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
+            scp -o StrictHostKeyChecking=no -P 51268 $JAR_PATH $SERVER_USER@$SERVER_HOST:/root/$PROJECT_NAME.jar
+            ssh -o StrictHostKeyChecking=no -P 51268 $SERVER_USER@$SERVER_HOST << 'EOF'
             if pgrep -f "$PROJECT_NAME.jar"; then
               pkill -f "$PROJECT_NAME.jar"
             fi
-              nohup java -jar /home/$SERVER_USER/$PROJECT_NAME.jar > /home/$SERVER_USER/$PROJECT_NAME.log 2>&1 &
+              nohup java -jar /root/$PROJECT_NAME.jar > /root/$PROJECT_NAME.log 2>&1 &
             EOF
