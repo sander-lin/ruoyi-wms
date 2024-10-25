@@ -39,10 +39,11 @@ jobs:
         uses: actions/setup-java@v3
         with:
           java-version: '11'
+          distribution: 'temurin'
 
-      # 编译项目
-      - name: Build with Gradle
-        run: ./gradlew clean build -x test
+      # 使用 Maven 构建项目
+      - name: Build with Maven
+        run: mvn clean package -DskipTests
 
       # 上传构建的 JAR 文件到服务器
       # - name: Deploy to Server
