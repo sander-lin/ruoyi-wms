@@ -17,7 +17,8 @@ env:
   REGISTRY: ghcr.io
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
-  
+  PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
+  JAR_PATH: "./target/ruoyi-wms-5.2.0.jar" # 替换为实际的 JAR 路径
 permissions:
   contents: read
   packages: write
@@ -85,22 +86,17 @@ jobs:
         
       - name: multiple command
         uses: appleboy/ssh-action@master
-        env:
-          SSH_PRIVATE_KEY: ${{ secrets.KEY }}
-          SERVER_HOST: ${{ secrets.HOST }}
-          SERVER_USER: ${{ secrets.USERNAME }}
-          PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
-          JAR_PATH: "./target/ruoyi-wms-5.2.0.jar" # 替换为实际的 JAR 路径
+        
         with:
-          host: $SERVER_HOST
-          username: $SERVER_USER
-          key: $SSH_PRIVATE_KEY
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.KEY }}
           port: 51268
           script_stop: true
           sync: true
           script: |
-            scp -o StrictHostKeyChecking=no -P 51268 $JAR_PATH $SERVER_USER@$SERVER_HOST:/root/$PROJECT_NAME.jar
-            ssh -o StrictHostKeyChecking=no -p 51268 $SERVER_USER@$SERVER_HOST << 'EOF'
+            scp -o StrictHostKeyChecking=no -P 51268 $JAR_PATH ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/root/$PROJECT_NAME.jar
+            ssh -o StrictHostKeyChecking=no -p 51268 ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
               if pgrep -f "$PROJECT_NAME.jar"; then
                 pkill -f "$PROJECT_NAME.jar"
               fi
