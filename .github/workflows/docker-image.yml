@@ -100,7 +100,7 @@ jobs:
           sync: true
           script: |
             scp -o StrictHostKeyChecking=no -P 51268 $JAR_PATH $SERVER_USER@$SERVER_HOST:/root/$PROJECT_NAME.jar
-            ssh -o StrictHostKeyChecking=no -P 51268 $SERVER_USER@$SERVER_HOST << 'EOF'
+            ssh -o StrictHostKeyChecking=no -p 51268 $SERVER_USER@$SERVER_HOST << 'EOF'
               if pgrep -f "$PROJECT_NAME.jar"; then
                 pkill -f "$PROJECT_NAME.jar"
               fi
