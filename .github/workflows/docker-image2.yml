@@ -43,12 +43,6 @@ jobs:
         uses: SpicyPizza/create-envfile@v2.0.2
         with:
           envkey_VITE_APP_ENV: production
-          envkey_VITE_APP_TITLE: WMS后台管理系统
-          envkey_VITE_APP_BASE_API:  "http://47.106.181.192:9000"
-          envkey_VITE_APP_CONTEXT_PATH: "/"
-          envkey_VITE_APP_MONITRO_ADMIN: "/admin/applications"
-          envkey_VITE_APP_XXL_JOB_ADMIN: "/xxl-job-admin"
-          envkey_VITE_BUILD_COMPRESS: gzip
           
       - name: Lowercase the repo name and username
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
