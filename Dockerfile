@@ -12,7 +12,7 @@ ENV SERVER_PORT=8080
 
 EXPOSE ${SERVER_PORT}
 
-ADD ./target/ruoyi-admin.jar ./app.jar
+ADD ./target/ruoyi-wms.jar ./app.jar
 
 ENTRYPOINT ["java", \
     "-Djava.security.egd=file:/dev/./urandom", \
