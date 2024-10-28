@@ -45,34 +45,6 @@ jobs:
       # 使用 Maven 构建项目
       - name: Build with Maven
         run: mvn clean package -DskipTests
-
-      # 上传构建的 JAR 文件到服务器
-      # - name: Deploy to Server
-      #   env:
-      #     SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
-      #     SERVER_HOST: ${{ secrets.SERVER_HOST }}
-      #     SERVER_USER: ${{ secrets.SERVER_USER }}
-      #     PROJECT_NAME: "my-spring-boot-app" # 设置你的项目名
-      #     JAR_PATH: "./build/libs/my-spring-boot-app-0.0.1-SNAPSHOT.jar" # 替换为实际的 JAR 路径
-      #   run: |
-      #     # 配置 SSH 密钥
-      #     mkdir -p ~/.ssh
-      #     echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
-      #     chmod 600 ~/.ssh/id_rsa
-
-      #     # 将 JAR 文件上传到服务器
-      #     scp -o StrictHostKeyChecking=no $JAR_PATH $SERVER_USER@$SERVER_HOST:/root/$PROJECT_NAME.jar
-
-      #     # 在服务器上启动/重启应用
-      #     ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_HOST << 'EOF'
-      #       # 杀掉已有的 Spring Boot 进程
-      #       if pgrep -f "$PROJECT_NAME.jar"; then
-      #         pkill -f "$PROJECT_NAME.jar"
-      #       fi
-
-      #       # 启动应用
-      #       nohup java -jar /home/$SERVER_USER/$PROJECT_NAME.jar > /home/$SERVER_USER/$PROJECT_NAME.log 2>&1 &
-      #     EOF
           
   deploy:
     permissions:
@@ -95,10 +67,10 @@ jobs:
           script_stop: true
           sync: true
           script: |
-            scp -o StrictHostKeyChecking=no -P 51268 $JAR_PATH ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/root/$PROJECT_NAME.jar
+            scp -o StrictHostKeyChecking=no -P 51268 ${{ env.JAR_PATH }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/root/${{ env.PROJECT_NAME }}.jar
             ssh -o StrictHostKeyChecking=no -p 51268 ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-              if pgrep -f "$PROJECT_NAME.jar"; then
-                pkill -f "$PROJECT_NAME.jar"
+              if pgrep -f "${{ env.PROJECT_NAME }}.jar"; then
+                pkill -f "${{ env.PROJECT_NAME }}.jar"
               fi
-              nohup java -jar /root/$PROJECT_NAME.jar > /root/$PROJECT_NAME.log 2>&1 &
+              nohup java -jar /root/${{ env.PROJECT_NAME }}.jar > /root/${{ env.PROJECT_NAME }}.log 2>&1 &
             EOF
