@@ -18,7 +18,7 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: ${{ github.repository }}
   PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
-  JAR_PATH: "./target/ruoyi-wms-5.2.0.jar" # 替换为实际的 JAR 路径
+  JAR_PATH: "./target/ruoyi-admin-wms.jar" # 替换为实际的 JAR 路径
 permissions:
   contents: read
   packages: write
