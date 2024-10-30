@@ -49,24 +49,48 @@ jobs:
     needs: build
 
     steps:
-      - name: Lowercase the repo name and username
-        run: echo "REPO=${GITHUB_REPOSITORY,,}" >>${GITHUB_ENV}
+      - name: Deploy to Server
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.KEY }}
+          SERVER_HOST: ${{ secrets.HOST }}
+          SERVER_USER: ${{ secrets.USERNAME }}
+          PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
+          JAR_PATH: "./ruoyi-admin-wms/target/ruoyi-admin-wms.jar" # 替换为实际的 JAR 路径
+        run: |
+          # 配置 SSH 密钥
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          # 将 JAR 文件上传到服务器
+          scp -o StrictHostKeyChecking=no -P 51268 $JAR_PATH $SERVER_USER@$SERVER_HOST:/root/$PROJECT_NAME.jar
+
+          # 在服务器上启动/重启应用
+          ssh -o StrictHostKeyChecking=no -p 51268 $SERVER_USER@$SERVER_HOST << 'EOF'
+            # 杀掉已有的 Spring Boot 进程
+            if pgrep -f "$PROJECT_NAME.jar"; then
+              pkill -f "$PROJECT_NAME.jar"
+            fi
+
+            # 启动应用
+            nohup java -jar -Xms512m -Xmx1024m /root/$PROJECT_NAME.jar > /root/$PROJECT_NAME.log 2>&1 &
+          EOF
         
-      - name: multiple command
-        uses: appleboy/ssh-action@master
+      # - name: multiple command
+      #   uses: appleboy/ssh-action@master
         
-        with:
-          host: ${{ secrets.HOST }}
-          username: ${{ secrets.USERNAME }}
-          key: ${{ secrets.KEY }}
-          port: 51268
-          script_stop: true
-          sync: true
-          script: |
-            scp -o StrictHostKeyChecking=no -P 51268 ${{ env.JAR_PATH }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/root/${{ env.PROJECT_NAME }}.jar
-            ssh -o StrictHostKeyChecking=no -p 51268 ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
-              if pgrep -f "${{ env.PROJECT_NAME }}.jar"; then
-                pkill -f "${{ env.PROJECT_NAME }}.jar"
-              fi
-              nohup java -jar /root/${{ env.PROJECT_NAME }}.jar > /root/${{ env.PROJECT_NAME }}.log 2>&1 &
-            EOF
+      #   with:
+      #     host: ${{ secrets.HOST }}
+      #     username: ${{ secrets.USERNAME }}
+      #     key: ${{ secrets.KEY }}
+      #     port: 51268
+      #     script_stop: true
+      #     sync: true
+      #     script: |
+      #       scp -o StrictHostKeyChecking=no -P 51268 ${{ env.JAR_PATH }} ${{ secrets.USERNAME }}@${{ secrets.HOST }}:/root/${{ env.PROJECT_NAME }}.jar
+      #       ssh -o StrictHostKeyChecking=no -p 51268 ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+      #         if pgrep -f "${{ env.PROJECT_NAME }}.jar"; then
+      #           pkill -f "${{ env.PROJECT_NAME }}.jar"
+      #         fi
+      #         nohup java -jar -Xms512m -Xmx1024m /root/${{ env.PROJECT_NAME }}.jar > /root/${{ env.PROJECT_NAME }}.log 2>&1 &
+      #       EOF
