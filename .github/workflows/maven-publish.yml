@@ -37,7 +37,7 @@ jobs:
 
       # 使用 Maven 构建项目
       - name: Build with Maven
-        run: mvn package -DskipTests
+        run: mvn clean package -DskipTests
           
   deploy:
     permissions:
