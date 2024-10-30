@@ -12,9 +12,6 @@ on:
     # tags: [ 'v*.*.*' ]
   workflow_dispatch:
 
-env:
-  PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
-  JAR_PATH: "./ruoyi-admin-wms/target/ruoyi-admin-wms.jar" # 替换为实际的 JAR 路径
 permissions:
   contents: read
   packages: write
@@ -55,7 +52,7 @@ jobs:
           SERVER_HOST: ${{ secrets.HOST }}
           SERVER_USER: ${{ secrets.USERNAME }}
           PROJECT_NAME: "ruoyi-wms" # 设置你的项目名
-          JAR_PATH: "./ruoyi-admin-wms/target/ruoyi-admin-wms.jar" # 替换为实际的 JAR 路径
+          JAR_PATH: "ruoyi-admin-wms/target/ruoyi-admin-wms.jar" # 替换为实际的 JAR 路径
         run: |
           # 配置 SSH 密钥
           mkdir -p ~/.ssh
