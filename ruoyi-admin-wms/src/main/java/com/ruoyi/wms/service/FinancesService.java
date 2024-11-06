@@ -33,7 +33,7 @@ public class FinancesService {
     /**
      * 查询资金明细
      */
-    public FinancesVo queryById(Long id){
+    public FinancesVo queryById(Long id) {
         return financesMapper.selectVoById(id);
     }
 
@@ -61,6 +61,7 @@ public class FinancesService {
         lqw.eq(bo.getBalance() != null, Finances::getBalance, bo.getBalance());
         lqw.eq(StringUtils.isNotBlank(bo.getType()), Finances::getType, bo.getType());
         lqw.eq(StringUtils.isNotBlank(bo.getSubType()), Finances::getSubType, bo.getSubType());
+        lqw.eq(bo.getUserId() != null, Finances::getUserId, bo.getUserId());
         return lqw;
     }
 

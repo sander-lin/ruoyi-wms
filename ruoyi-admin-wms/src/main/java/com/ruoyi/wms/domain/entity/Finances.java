@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
-
 import java.io.Serial;
 
 /**
@@ -20,7 +19,7 @@ import java.io.Serial;
 public class Finances extends BaseEntity {
 
     @Serial
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      * ID
@@ -43,5 +42,9 @@ public class Finances extends BaseEntity {
      * 账单子类型
      */
     private String subType;
+    /**
+     * 关联用户id
+     */
+    private Long userId;
 
 }

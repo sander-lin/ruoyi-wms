@@ -57,5 +57,10 @@ public class FinancesVo implements Serializable {
     @ExcelDictFormat(dictType = "wms_finances_sub_type")
     private String subType;
 
+    /**
+     * 关联用户id
+     */
+    @ExcelProperty(value = "关联用户id")
+    private Long userId;
 
 }

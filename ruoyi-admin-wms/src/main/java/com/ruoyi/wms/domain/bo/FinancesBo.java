@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import io.github.linpeilie.annotations.AutoMapper;
 
-
 /**
  * 资金明细业务对象 finances
  *
@@ -52,5 +51,9 @@ public class FinancesBo extends BaseEntity {
     @NotBlank(message = "账单子类型不能为空", groups = { AddGroup.class, EditGroup.class })
     private String subType;
 
-
+    /**
+     * 关联用户id
+     */
+    @NotNull(message = "关联用户id不能为空", groups = { AddGroup.class, EditGroup.class })
+    private Long userId;
 }
