@@ -5,30 +5,35 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
+
 import java.io.Serial;
 
 /**
- * 物流渠道对象 wms_logistics
+ * 物流渠道对象 logistics_channel
  *
  * @author zcc
- * @date 2024-10-22
+ * @date 2024-11-08
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("wms_logistics")
-public class Logistics extends BaseEntity {
+@TableName("logistics_channel")
+public class LogisticsChannel extends BaseEntity {
 
     @Serial
-    private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID=1L;
 
     /**
      * 
      */
     @TableId(value = "id")
-    private Long id;
+    private String id;
     /**
-     * 物流渠道名称
+     * 
      */
-    private String logisticsName;
+    private String name;
+    /**
+     * 
+     */
+    private String value;
 
 }
