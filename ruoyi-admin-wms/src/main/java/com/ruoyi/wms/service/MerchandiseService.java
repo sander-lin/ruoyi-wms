@@ -33,7 +33,7 @@ public class MerchandiseService {
     /**
      * 查询商品管理
      */
-    public MerchandiseVo queryById(String id){
+    public MerchandiseVo queryById(String id) {
         return merchandiseMapper.selectVoById(id);
     }
 
