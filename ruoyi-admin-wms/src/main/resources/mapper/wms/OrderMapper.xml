@@ -3,5 +3,62 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wms.mapper.OrderMapper">
+    <resultMap id="OrderResMap" type="com.ruoyi.wms.domain.vo.OrderVo">
+        <id property="id" column="order_id" />
+        <result property="userId" column="user_id" />
+        <result property="type" column="type" />
+        <result property="status" column="status" />
+        <result property="remark" column="remark" />
+        <result property="option" column="option" />
 
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+                    select="selectMerchandiseList" column="order_id"/>
+    </resultMap>
+
+    <resultMap id="MerchandiseResMap" type="com.ruoyi.wms.domain.vo.MerchandiseVo">
+        <id property="id" column="id" />
+        <result property="name" column="name" />
+        <result property="fnsku" column="fnsku" />
+        <result property="asin" column="asin" />
+        <result property="size" column="size" />
+        <result property="color" column="color" />
+        <result property="type" column="type" />
+        <result property="image" column="image" />
+        <result property="price" column="price" />
+    </resultMap>
+
+    <sql id="OrderList">
+        select o.*, o.id as order_id
+        from `order` o
+    </sql>
+
+    <select id="selectMerchandiseList" resultMap="MerchandiseResMap">
+        select
+            m.*,
+            m.id as m_id
+        from order_merchandise om
+        inner join merchandise m on m.id = om.merchandise_id
+        where om.order_id = #{order_id}
+    </select>
+
+    <select id="selectOrderList" resultMap="OrderResMap">
+        <include refid="OrderList" />
+        <where>
+            <if test="bo.id != null and bo.id != ''">
+                and o.id = #{bo.id}
+            </if>
+            <if test="bo.userId != null and bo.userId !='' ">
+                and o.user_id = #{bo.userId}
+            </if>
+            <if test="bo.type != null and bo.type != ''">
+                and o.type = #{bo.type}
+            </if>
+            <if test="bo.status != null and bo.status != ''">
+                and o.status = #{bo.status}
+            </if>
+            <if test="bo.option != null and bo.option != ''" >
+                and o.option = #{bo.option}
+            </if>
+        </where>
+    </select>
 </mapper>

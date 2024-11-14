@@ -2,6 +2,8 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
+import cn.dev33.satoken.annotation.SaIgnore;
+import com.ruoyi.wms.service.MerchandiseService;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -36,13 +38,19 @@ public class OrderController extends BaseController {
 
     private final OrderService orderService;
 
-    /**
-     * 查询订单表列表
-     */
-    @SaCheckPermission("wms:order:list")
+//    /**
+//     * 查询订单表列表
+//     */
+//    @SaCheckPermission("wms:order:list")
+//    @GetMapping("/list")
+//    public TableDataInfo<OrderVo> list(OrderBo bo, PageQuery pageQuery) {
+//        return orderService.queryPageList(bo, pageQuery);
+//    }
+
+    @SaIgnore
     @GetMapping("/list")
-    public TableDataInfo<OrderVo> list(OrderBo bo, PageQuery pageQuery) {
-        return orderService.queryPageList(bo, pageQuery);
+    public TableDataInfo<OrderVo> lists(OrderBo bo, PageQuery pageQuery) {
+        return  orderService.OrderList(bo, pageQuery);
     }
 
     /**

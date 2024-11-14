@@ -1,5 +1,6 @@
 package com.ruoyi.wms.domain.vo;
 
+import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.domain.entity.Order;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
@@ -10,6 +11,7 @@ import io.github.linpeilie.annotations.AutoMapper;
 
 import java.io.Serializable;
 import java.io.Serial;
+import java.util.List;
 
 /**
  * 订单表视图对象 order
@@ -26,7 +28,7 @@ public class OrderVo implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String id;
@@ -61,5 +63,6 @@ public class OrderVo implements Serializable {
     @ExcelProperty(value = "选项")
     private String option;
 
+    private List<MerchandiseVo> merchandises;
 
 }

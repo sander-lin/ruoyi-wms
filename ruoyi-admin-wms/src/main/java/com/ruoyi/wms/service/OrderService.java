@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.OrderBo;
 import com.ruoyi.wms.domain.vo.OrderVo;
@@ -43,6 +44,11 @@ public class OrderService {
     public TableDataInfo<OrderVo> queryPageList(OrderBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<Order> lqw = buildQueryWrapper(bo);
         Page<OrderVo> result = orderMapper.selectVoPage(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
+    }
+
+    public TableDataInfo<OrderVo> OrderList(OrderBo bo, PageQuery pageQuery) {
+        Page<OrderVo> result = orderMapper.selectOrderList(pageQuery.build(), bo);
         return TableDataInfo.build(result);
     }
 
