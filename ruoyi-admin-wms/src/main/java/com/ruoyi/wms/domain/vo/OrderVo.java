@@ -37,7 +37,7 @@ public class OrderVo implements Serializable {
      * 所属客户
      */
     @ExcelProperty(value = "所属客户")
-    private String userId;
+    private OptionItemVo user;
 
     /**
      * 订单类型
@@ -50,6 +50,12 @@ public class OrderVo implements Serializable {
      */
     @ExcelProperty(value = "订单状态")
     private String status;
+
+    /**
+     * 订单总额
+     */
+    @ExcelProperty(value = "订单总额")
+    private String totalAmount;
 
     /**
      * 备注

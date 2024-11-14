@@ -85,4 +85,10 @@ public class MerchandiseVo implements Serializable {
      */
     @ExcelProperty(value = "单价")
     private BigDecimal price;
+
+    /**
+     * 数量
+     */
+    @ExcelProperty(value = "数量")
+    private String quantity;
 }
