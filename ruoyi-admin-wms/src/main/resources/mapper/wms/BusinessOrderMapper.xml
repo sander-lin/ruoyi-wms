@@ -8,7 +8,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="type" column="type" />
         <result property="status" column="status" />
         <result property="remark" column="remark" />
-        <result property="totalAmount" column="total_Amount" />
+        <result property="totalAmount" column="total_amount" />
 
         <association property="user" javaType="com.ruoyi.wms.domain.vo.OptionItemVo" column="order_id" select="selectUser" />
 
@@ -27,7 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="image" column="image" />
         <result property="price" column="price" />
         <result property="quantity" column="quantity" />
-        <result property="option" column="option" />
+        <result property="labelOption" column="label_option" />
     </resultMap>
 
     <resultMap id="UserOptionResMap" type="com.ruoyi.wms.domain.vo.OptionItemVo">
@@ -40,7 +40,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.quantity,
             m.*,
             m.id as m_id,
-            om.option
+            om.label_option
         from order_merchandise om
         inner join merchandise m on m.id = om.merchandise_id
         where om.order_id = #{order_id}

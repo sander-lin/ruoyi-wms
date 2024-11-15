@@ -9,6 +9,8 @@ import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import io.github.linpeilie.annotations.AutoMapper;
 
+import java.io.Serializable;
+
 
 /**
  * 订单商品关系业务对象 order_merchandise
@@ -18,9 +20,9 @@ import io.github.linpeilie.annotations.AutoMapper;
  */
 
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode()
 @AutoMapper(target = OrderMerchandise.class, reverseConvertGenerate = false)
-public class OrderMerchandiseBo extends BaseEntity {
+public class OrderMerchandiseBo implements Serializable {
 
     /**
      * 订单id
@@ -43,5 +45,5 @@ public class OrderMerchandiseBo extends BaseEntity {
      * 选项
      */
     @NotBlank(message = "选项不能为空", groups = { AddGroup.class, EditGroup.class })
-    private String option;
+    private String labelOption;
 }

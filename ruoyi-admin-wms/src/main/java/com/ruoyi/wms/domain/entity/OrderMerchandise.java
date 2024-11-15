@@ -7,6 +7,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 
 import java.io.Serial;
+import java.io.Serializable;
 
 /**
  * 订单商品关系对象 order_merchandise
@@ -15,9 +16,9 @@ import java.io.Serial;
  * @date 2024-11-15
  */
 @Data
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode()
 @TableName("order_merchandise")
-public class OrderMerchandise extends BaseEntity {
+public class OrderMerchandise implements Serializable {
 
     @Serial
     private static final long serialVersionUID=1L;
@@ -42,6 +43,6 @@ public class OrderMerchandise extends BaseEntity {
     /**
      * 选项
      */
-    private String option;
+    private String labelOption;
 
 }
