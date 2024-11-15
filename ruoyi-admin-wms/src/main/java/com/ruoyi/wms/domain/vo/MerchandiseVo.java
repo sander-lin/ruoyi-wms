@@ -96,5 +96,5 @@ public class MerchandiseVo implements Serializable {
      * 选项
      */
     @ExcelProperty(value = "选项")
-    private String option;
+    private String labelOption;
 }
