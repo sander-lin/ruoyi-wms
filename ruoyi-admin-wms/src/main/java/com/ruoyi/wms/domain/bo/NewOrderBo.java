@@ -1,29 +1,29 @@
 package com.ruoyi.wms.domain.bo;
 
-import com.ruoyi.wms.domain.entity.Order;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.wms.domain.entity.BusinessOrder;
+import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
-import io.github.linpeilie.annotations.AutoMapper;
+
+import java.util.List;
 
 
 /**
  * 订单表业务对象 order
  *
- * @author zcc
- * @date 2024-11-11
  */
 
 @Data
 @EqualsAndHashCode(callSuper = true)
-@AutoMapper(target = Order.class, reverseConvertGenerate = false)
-public class OrderBo extends BaseEntity {
+@AutoMapper(target = BusinessOrder.class, reverseConvertGenerate = false)
+public class NewOrderBo extends BaseEntity {
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "不能为空", groups = { EditGroup.class })
     private String id;
@@ -52,11 +52,5 @@ public class OrderBo extends BaseEntity {
     @NotBlank(message = "备注不能为空", groups = { AddGroup.class, EditGroup.class })
     private String remark;
 
-    /**
-     * 选项
-     */
-    @NotBlank(message = "选项不能为空", groups = { AddGroup.class, EditGroup.class })
-    private String option;
-
-
+    private List<OrderMerchandiseBo> merchandises;
 }

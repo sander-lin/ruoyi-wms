@@ -17,8 +17,8 @@ import java.math.BigDecimal;
  */
 @Data
 @EqualsAndHashCode(callSuper = true)
-@TableName("order")
-public class Order extends BaseEntity {
+@TableName("business_order")
+public class BusinessOrder extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID=1L;
@@ -44,10 +44,7 @@ public class Order extends BaseEntity {
      * 备注
      */
     private String remark;
-    /**
-     * 选项
-     */
-    private String option;
+
     /**
      * 订单总额
      */

@@ -1,11 +1,8 @@
 package com.ruoyi.wms.domain.vo;
 
-import com.ruoyi.wms.domain.entity.Merchandise;
-import com.ruoyi.wms.domain.entity.Order;
+import com.ruoyi.wms.domain.entity.BusinessOrder;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
 
@@ -21,8 +18,8 @@ import java.util.List;
  */
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = Order.class)
-public class OrderVo implements Serializable {
+@AutoMapper(target = BusinessOrder.class)
+public class BusinessOrderVo implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1L;
@@ -62,12 +59,6 @@ public class OrderVo implements Serializable {
      */
     @ExcelProperty(value = "备注")
     private String remark;
-
-    /**
-     * 选项
-     */
-    @ExcelProperty(value = "选项")
-    private String option;
 
     private List<MerchandiseVo> merchandises;
 

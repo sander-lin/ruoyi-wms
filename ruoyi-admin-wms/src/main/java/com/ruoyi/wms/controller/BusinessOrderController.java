@@ -3,7 +3,9 @@ package com.ruoyi.wms.controller;
 import java.util.List;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.ruoyi.wms.service.MerchandiseService;
+import com.ruoyi.wms.domain.bo.NewOrderBo;
+import com.ruoyi.wms.domain.vo.BusinessOrderVo;
+import com.ruoyi.wms.service.BusinessOrderService;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -19,9 +21,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.vo.OrderVo;
-import com.ruoyi.wms.domain.bo.OrderBo;
-import com.ruoyi.wms.service.OrderService;
+import com.ruoyi.wms.domain.bo.BusinessOrderBo;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
 /**
@@ -34,9 +34,9 @@ import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/wms/order")
-public class OrderController extends BaseController {
+public class BusinessOrderController extends BaseController {
 
-    private final OrderService orderService;
+    private final BusinessOrderService orderService;
 
 //    /**
 //     * 查询订单表列表
@@ -49,7 +49,7 @@ public class OrderController extends BaseController {
 
     @SaIgnore
     @GetMapping("/list")
-    public TableDataInfo<OrderVo> lists(OrderBo bo, PageQuery pageQuery) {
+    public TableDataInfo<BusinessOrderVo> lists(BusinessOrderBo bo, PageQuery pageQuery) {
         return  orderService.OrderList(bo, pageQuery);
     }
 
@@ -59,9 +59,9 @@ public class OrderController extends BaseController {
     @SaCheckPermission("wms:order:export")
     @Log(title = "订单表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(OrderBo bo, HttpServletResponse response) {
-        List<OrderVo> list = orderService.queryList(bo);
-        ExcelUtil.exportExcel(list, "订单表", OrderVo.class, response);
+    public void export(BusinessOrderBo bo, HttpServletResponse response) {
+        List<BusinessOrderVo> list = orderService.queryList(bo);
+        ExcelUtil.exportExcel(list, "订单表", BusinessOrderVo.class, response);
     }
 
     /**
@@ -71,7 +71,7 @@ public class OrderController extends BaseController {
      */
     @SaCheckPermission("wms:order:query")
     @GetMapping("/{id}")
-    public R<OrderVo> getInfo(@NotNull(message = "主键不能为空")
+    public R<BusinessOrderVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable String id) {
         return R.ok(orderService.queryById(id));
     }
@@ -83,7 +83,7 @@ public class OrderController extends BaseController {
     @Log(title = "订单表", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody OrderBo bo) {
+    public R<Void> add(@Validated(AddGroup.class) @RequestBody NewOrderBo bo) {
         orderService.insertByBo(bo);
         return R.ok();
     }
@@ -95,7 +95,7 @@ public class OrderController extends BaseController {
     @Log(title = "订单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody OrderBo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
         orderService.updateByBo(bo);
         return R.ok();
     }
