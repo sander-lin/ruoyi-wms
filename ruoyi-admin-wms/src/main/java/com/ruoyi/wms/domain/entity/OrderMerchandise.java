@@ -39,7 +39,7 @@ public class OrderMerchandise implements Serializable {
     /**
      * 需求数量
      */
-    private String quantity;
+    private String quantity_required;
     /**
      * 选项
      */

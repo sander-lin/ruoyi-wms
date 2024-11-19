@@ -7,12 +7,13 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.ruoyi.wms.domain.bo.NewOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.entity.BusinessOrder;
-import com.ruoyi.wms.domain.vo.BusinessOrderVo;
+import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
+import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ruoyi.wms.domain.bo.BusinessOrderBo;
 import com.ruoyi.wms.mapper.BusinessOrderMapper;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,6 +39,10 @@ public class BusinessOrderService {
      */
     public BusinessOrderVo queryById(String id){
         return businessOrderMapper.selectVoById(id);
+    }
+
+    public BusinessOrderDetailVo queryOrderDetailById(String id) {
+        return businessOrderMapper.selectOrderDetailById(Long.valueOf(id));
     }
 
     /**

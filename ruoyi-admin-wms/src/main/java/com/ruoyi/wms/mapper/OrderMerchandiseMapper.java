@@ -1,6 +1,6 @@
 package com.ruoyi.wms.mapper;
 
-import com.ruoyi.wms.domain.bo.OrderMerchandiseBo;
+import com.ruoyi.wms.domain.bo.businessorder.OrderMerchandiseBo;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 

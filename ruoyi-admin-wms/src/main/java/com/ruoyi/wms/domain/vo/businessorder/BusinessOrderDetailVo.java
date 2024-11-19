@@ -1,26 +1,20 @@
-package com.ruoyi.wms.domain.vo;
+package com.ruoyi.wms.domain.vo.businessorder;
 
-import com.ruoyi.wms.domain.entity.BusinessOrder;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import lombok.Data;
+import com.ruoyi.wms.domain.vo.MerchandiseVo;
+import com.ruoyi.wms.domain.vo.OptionItemVo;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo;
 import io.github.linpeilie.annotations.AutoMapper;
+import lombok.Data;
 
-import java.io.Serializable;
 import java.io.Serial;
+import java.io.Serializable;
 import java.util.List;
 
-/**
- * 订单表视图对象 order
- *
- * @author zcc
- * @date 2024-11-11
- */
 @Data
 @ExcelIgnoreUnannotated
-@AutoMapper(target = BusinessOrder.class)
-public class BusinessOrderVo implements Serializable {
-
+public class BusinessOrderDetailVo implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -62,4 +56,5 @@ public class BusinessOrderVo implements Serializable {
 
     private List<MerchandiseVo> merchandises;
 
+    private List<ShipmentNoticeOrderDetailVo> shipmentNotices;
 }
