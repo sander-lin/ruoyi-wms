@@ -39,25 +39,24 @@ public class BusinessOrderController extends BaseController {
 
     private final BusinessOrderService orderService;
 
-//    /**
-//     * 查询订单表列表
-//     */
-//    @SaCheckPermission("wms:order:list")
-//    @GetMapping("/list")
-//    public TableDataInfo<OrderVo> list(OrderBo bo, PageQuery pageQuery) {
-//        return orderService.queryPageList(bo, pageQuery);
-//    }
-
+    /**
+     * 查询订单表列表
+     */
     @SaCheckPermission("wms:order:list")
     @GetMapping("/list")
     public TableDataInfo<BusinessOrderVo> lists(BusinessOrderBo bo, PageQuery pageQuery) {
-        return  orderService.OrderList(bo, pageQuery);
+        return orderService.OrderList(bo, pageQuery);
     }
 
+    /**
+     * 获取订单表详细信息
+     *
+     * @param id 主键
+     */
     @SaCheckPermission("wms:order:query")
     @GetMapping("/{id}")
-    public BusinessOrderDetailVo queryDetailById(@NotNull(message = "id不能为空") @PathVariable String id){
-        return orderService.queryOrderDetailById(id);
+    public R<BusinessOrderDetailVo> queryDetailById(@NotNull(message = "id不能为空") @PathVariable String id){
+        return R.ok(orderService.queryOrderDetailById(id));
     }
 
     /**
@@ -71,17 +70,6 @@ public class BusinessOrderController extends BaseController {
         ExcelUtil.exportExcel(list, "订单表", BusinessOrderVo.class, response);
     }
 
-//    /**
-//     * 获取订单表详细信息
-//     *
-//     * @param id 主键
-//     */
-//    @SaCheckPermission("wms:order:query")
-//    @GetMapping("/{id}")
-//    public R<BusinessOrderVo> getInfo(@NotNull(message = "主键不能为空")
-//                                     @PathVariable String id) {
-//        return R.ok(orderService.queryById(id));
-//    }
 
     /**
      * 新增订单表
