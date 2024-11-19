@@ -438,7 +438,7 @@
         </resources>
     </build>
 
-    <repositories>
+    <!-- <repositories>
         <repository>
             <id>public</id>
             <name>huawei nexus</name>
@@ -461,7 +461,7 @@
                 <enabled>false</enabled>
             </snapshots>
         </pluginRepository>
-    </pluginRepositories>
+    </pluginRepositories> -->
 
 </project>
 
