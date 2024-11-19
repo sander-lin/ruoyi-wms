@@ -3,8 +3,10 @@ package com.ruoyi.wms.controller;
 import java.util.List;
 
 import cn.dev33.satoken.annotation.SaIgnore;
-import com.ruoyi.wms.domain.bo.NewOrderBo;
-import com.ruoyi.wms.domain.vo.BusinessOrderVo;
+import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
+import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
+import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
 import com.ruoyi.wms.service.BusinessOrderService;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -21,7 +23,6 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.bo.BusinessOrderBo;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
 /**
@@ -47,10 +48,16 @@ public class BusinessOrderController extends BaseController {
 //        return orderService.queryPageList(bo, pageQuery);
 //    }
 
-    @SaIgnore
+    @SaCheckPermission("wms:order:list")
     @GetMapping("/list")
     public TableDataInfo<BusinessOrderVo> lists(BusinessOrderBo bo, PageQuery pageQuery) {
         return  orderService.OrderList(bo, pageQuery);
+    }
+
+    @SaCheckPermission("wms:order:query")
+    @GetMapping("/{id}")
+    public BusinessOrderDetailVo queryDetailById(@NotNull(message = "id不能为空") @PathVariable String id){
+        return orderService.queryOrderDetailById(id);
     }
 
     /**
@@ -64,17 +71,17 @@ public class BusinessOrderController extends BaseController {
         ExcelUtil.exportExcel(list, "订单表", BusinessOrderVo.class, response);
     }
 
-    /**
-     * 获取订单表详细信息
-     *
-     * @param id 主键
-     */
-    @SaCheckPermission("wms:order:query")
-    @GetMapping("/{id}")
-    public R<BusinessOrderVo> getInfo(@NotNull(message = "主键不能为空")
-                                     @PathVariable String id) {
-        return R.ok(orderService.queryById(id));
-    }
+//    /**
+//     * 获取订单表详细信息
+//     *
+//     * @param id 主键
+//     */
+//    @SaCheckPermission("wms:order:query")
+//    @GetMapping("/{id}")
+//    public R<BusinessOrderVo> getInfo(@NotNull(message = "主键不能为空")
+//                                     @PathVariable String id) {
+//        return R.ok(orderService.queryById(id));
+//    }
 
     /**
      * 新增订单表

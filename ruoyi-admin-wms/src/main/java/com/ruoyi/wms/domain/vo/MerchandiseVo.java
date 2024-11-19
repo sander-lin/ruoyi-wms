@@ -87,10 +87,22 @@ public class MerchandiseVo implements Serializable {
     private BigDecimal price;
 
     /**
-     * 数量
+     * 总已发数量
      */
-    @ExcelProperty(value = "数量")
-    private String quantity;
+    @ExcelProperty(value = "总已发数量")
+    private String quantity_shipped;
+
+    /**
+     * 通知发货数量
+     */
+    @ExcelProperty(value = "通知发货数量")
+    private String quantity_notice;
+
+    /**
+     * 订单需求数量
+     */
+    @ExcelProperty(value = "订单需求数量")
+    private String quantity_required;
 
     /**
      * 选项
