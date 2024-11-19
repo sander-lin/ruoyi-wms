@@ -2,6 +2,7 @@ package com.ruoyi.wms.domain.vo.businessorder;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.vo.MerchandiseVo;
 import com.ruoyi.wms.domain.vo.OptionItemVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo;
@@ -14,10 +15,7 @@ import java.util.List;
 
 @Data
 @ExcelIgnoreUnannotated
-public class BusinessOrderDetailVo implements Serializable {
-    @Serial
-    private static final long serialVersionUID = 1L;
-
+public class BusinessOrderDetailVo extends BaseVo {
     /**
      *
      */

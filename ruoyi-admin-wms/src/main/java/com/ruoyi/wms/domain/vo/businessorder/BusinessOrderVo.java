@@ -1,5 +1,6 @@
  package com.ruoyi.wms.domain.vo.businessorder;
 
+ import com.ruoyi.common.mybatis.core.domain.BaseVo;
  import com.ruoyi.wms.domain.entity.BusinessOrder;
  import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
  import com.alibaba.excel.annotation.ExcelProperty;
@@ -22,11 +23,7 @@
  @Data
  @ExcelIgnoreUnannotated
  @AutoMapper(target = BusinessOrder.class)
- public class BusinessOrderVo implements Serializable {
-
-     @Serial
-     private static final long serialVersionUID = 1L;
-
+ public class BusinessOrderVo extends BaseVo {
      /**
       *
       */

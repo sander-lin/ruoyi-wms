@@ -90,19 +90,19 @@ public class MerchandiseVo implements Serializable {
      * 总已发数量
      */
     @ExcelProperty(value = "总已发数量")
-    private String quantity_shipped;
+    private String quantityShipped;
 
     /**
      * 通知发货数量
      */
     @ExcelProperty(value = "通知发货数量")
-    private String quantity_notice;
+    private String quantityNotice;
 
     /**
      * 订单需求数量
      */
     @ExcelProperty(value = "订单需求数量")
-    private String quantity_required;
+    private String quantityRequired;
 
     /**
      * 选项

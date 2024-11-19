@@ -27,9 +27,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="type" column="type" />
         <result property="image" column="image" />
         <result property="price" column="price" />
-        <result property="quantity_required" column="quantity_required" />
-        <result property="quantity_shipped" column="quantity_shipped" />
-        <result property="quantity_notice" column="quantity_notice" />
+        <result property="quantityRequired" column="quantity_required" />
+        <result property="quantityShipped" column="quantity_shipped" />
+        <result property="quantityNotice" column="quantity_notice" />
         <result property="labelOption" column="label_option" />
     </resultMap>
 
@@ -39,7 +39,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </resultMap>
 
     <resultMap id="DeliveryMethodOptionResMap" type="com.ruoyi.wms.domain.vo.OptionItemVo">
-        <id property="value" column="value" />
+        <id property="value" column="id" />
         <result property="key" column="name" />
     </resultMap>
 
@@ -94,29 +94,32 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectMerchandiseListByOrderId" resultMap="MerchandiseResMap">
-        select
+        select distinct
             m.*,
+            om.label_option,
             om.quantity_required,
             om.quantity_notice,
             sqs.quantity_shipped
-        from business_order bo
-        inner join order_merchandise om on om.order_id = bo.id
-        inner join merchandise m on m.id = om.merchandise_id
-        inner join (
+        from (
             select
+                order_id,
                 merchandise_id,
                 sum(om2.quantity_shipped) quantity_shipped
             from order_merchandise om2
             where om2.order_id = #{order_id}
-            group by om2.merchandise_id
+            group by om2.merchandise_id,om2.order_id
         ) sqs
-        where om.order_id = #{order_id}
+        inner join order_merchandise om on om.order_id = sqs.order_id and sqs.merchandise_id = om.merchandise_id
+        inner join merchandise m on m.id = sqs.merchandise_id
+        inner join business_order bo on bo.id = sqs.order_id
     </select>
 
     <select id="selectMerchandiseListByShipmentNoticeId" resultMap="MerchandiseResMap">
         select
             m.*,
-            om.quantity_required
+            om.label_option,
+            om.quantity_required,
+            om.quantity_notice
         from shipment_notice sn
         inner join order_merchandise om on om.shipment_notice_id = sn.id
         inner join merchandise m on m.id = om.merchandise_id
@@ -126,9 +129,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectDeliveryMethodItem" resultMap="DeliveryMethodOptionResMap">
         select
             name,
-            value
+            id
         from logistics_channel
-        where delivery_method = #{delivery_method}
+        where id = #{delivery_method}
     </select>
     <select id="selectUser" resultMap="UserOptionResMap">
         select
@@ -157,7 +160,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </where>
     </select>
 
-    <select id="selectOrderDetail" resultMap="OrderDetailResMap" parameterType="Long">
+    <select id="selectOrderDetailById" resultMap="OrderDetailResMap" parameterType="Long">
         select
             *,
             id order_id
