@@ -11,6 +11,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="status" column="status" />
         <result property="deliveryMethod" column="delivery_method" />
         <result property="remark" column="remark" />
+        <result property="createTime" column="create_time" />
         <collection property="merchandises" column="id" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
                     select="selectShipmentNoticeMerchandise"/>
     </resultMap>
@@ -24,9 +25,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <select id="selectShipmentNoticeMerchandise" resultType="com.ruoyi.wms.domain.vo.MerchandiseVo">
         select
             m.*
-        from shipment_notice sn
-        inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+        from shipment_notice_merchandise snm
         inner join merchandise m on m.id = snm.merchandise_id
-        where sn.id = #{id}
+        where sn.shipment_notice_id = #{id}
     </select>
 </mapper>
