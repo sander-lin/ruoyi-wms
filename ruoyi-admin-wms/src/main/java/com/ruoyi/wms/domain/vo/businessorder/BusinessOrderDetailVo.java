@@ -8,6 +8,7 @@ import com.ruoyi.wms.domain.vo.OptionItemVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Data
 @ExcelIgnoreUnannotated
+@EqualsAndHashCode(callSuper = true)
 public class BusinessOrderDetailVo extends BaseVo {
     /**
      *

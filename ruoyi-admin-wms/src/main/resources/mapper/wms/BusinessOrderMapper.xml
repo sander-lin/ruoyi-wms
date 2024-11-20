@@ -94,35 +94,61 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectMerchandiseListByOrderId" resultMap="MerchandiseResMap">
-        select distinct
-            m.*,
+        SELECT DISTINCT
+            m.id,
+            m.asin,
+            m.color,
+            m.fnsku,
+            m.image,
+            m.`name`,
+            m.price,
+            m.size,
+            m.type,
             om.label_option,
-            om.quantity_required,
-            om.quantity_notice,
-            sqs.quantity_shipped
-        from (
-            select
-                order_id,
-                merchandise_id,
-                sum(om2.quantity_shipped) quantity_shipped
-            from order_merchandise om2
-            where om2.order_id = #{order_id}
-            group by om2.merchandise_id,om2.order_id
-        ) sqs
-        inner join order_merchandise om on om.order_id = sqs.order_id and sqs.merchandise_id = om.merchandise_id
-        inner join merchandise m on m.id = sqs.merchandise_id
-        inner join business_order bo on bo.id = sqs.order_id
+            sqs.quantity_shipped,
+            om.quantity_required
+        FROM (select
+                *
+            from business_order
+            where id = #{order_id}
+        ) bo
+        JOIN order_merchandise om on om.order_id = bo.id
+        JOIN merchandise m on m.id = om.merchandise_id
+        LEFT JOIN (
+            SELECT DISTINCT
+                sm.merchandise_id,
+                SUM(sm.quantity_shipped) quantity_shipped
+            FROM (
+                SELECT
+                    *
+                FROM shipment_notice
+                WHERE order_id =  #{order_id}
+            ) sn
+            JOIN shipment_notice_merchandise snm ON snm.shipment_notice_id = sn.id
+            JOIN shipment s on s.shipment_notice_id = snm.shipment_notice_id
+            JOIN shipment_merchandise sm ON sm.shipment_id = s.id
+            GROUP BY sm.merchandise_id
+        ) sqs on sqs.merchandise_id = m.id
     </select>
 
     <select id="selectMerchandiseListByShipmentNoticeId" resultMap="MerchandiseResMap">
-        select
-            m.*,
+        select distinct
+            m.id,
+            m.asin,
+            m.color,
+            m.fnsku,
+            m.image,
+            m.`name`,
+            m.price,
+            m.size,
+            m.type,
             om.label_option,
             om.quantity_required,
-            om.quantity_notice
+            snm.quantity_notice
         from shipment_notice sn
-        inner join order_merchandise om on om.shipment_notice_id = sn.id
-        inner join merchandise m on m.id = om.merchandise_id
+        inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+        inner join order_merchandise om on om.order_id = sn.order_id AND om.merchandise_id = snm.merchandise_id
+        inner join merchandise m on m.id = snm.merchandise_id
         where sn.id = #{shipment_notice_id}
     </select>
 

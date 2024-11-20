@@ -9,6 +9,7 @@
  import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo;
  import lombok.Data;
  import io.github.linpeilie.annotations.AutoMapper;
+ import lombok.EqualsAndHashCode;
 
  import java.io.Serializable;
  import java.io.Serial;
@@ -22,6 +23,7 @@
   */
  @Data
  @ExcelIgnoreUnannotated
+ @EqualsAndHashCode(callSuper = true)
  @AutoMapper(target = BusinessOrder.class)
  public class BusinessOrderVo extends BaseVo {
      /**
