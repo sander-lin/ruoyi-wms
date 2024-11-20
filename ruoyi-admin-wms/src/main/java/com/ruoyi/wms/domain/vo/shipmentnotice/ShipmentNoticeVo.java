@@ -1,15 +1,19 @@
-package com.ruoyi.wms.domain.vo;
+package com.ruoyi.wms.domain.vo.shipmentnotice;
 
+import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
 import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import com.ruoyi.wms.domain.vo.MerchandiseVo;
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.io.Serial;
+import java.util.List;
 
 /**
  * 发货请求通知单视图对象 shipment_notice
@@ -20,25 +24,26 @@ import java.io.Serial;
 @Data
 @ExcelIgnoreUnannotated
 @AutoMapper(target = ShipmentNotice.class)
-public class ShipmentNoticeVo implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class ShipmentNoticeVo extends BaseVo {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String id;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String orderId;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String userId;
@@ -68,5 +73,5 @@ public class ShipmentNoticeVo implements Serializable {
     @ExcelProperty(value = "备注")
     private String remark;
 
-
+    private List<MerchandiseVo> merchandises;
 }

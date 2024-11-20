@@ -15,7 +15,7 @@ import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
-import com.ruoyi.wms.domain.vo.ShipmentNoticeVo;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +45,12 @@ public class ShipmentNoticeService {
         return shipmentNoticeMapper.selectVoById(id);
     }
 
+
+    public TableDataInfo<ShipmentNoticeVo> queryShipmentNoticeList(ShipmentNoticeBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<ShipmentNotice> lqw = buildQueryWrapper(bo);
+        Page<ShipmentNoticeVo> result = shipmentNoticeMapper.selectShipmentNoticeVoList(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
+    }
     /**
      * 查询发货请求通知单列表
      */

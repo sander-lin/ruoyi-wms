@@ -29,9 +29,9 @@ public class ShipmentNoticeOrderDetailVo extends BaseVo {
     private String orderId;
 
     /**
-     *
+     * 所属客户
      */
-    private OptionItemVo user;
+    private String userId;
 
     /**
      * 标签种类
@@ -48,7 +48,7 @@ public class ShipmentNoticeOrderDetailVo extends BaseVo {
     /**
      * 配送方式（物流渠道）
      */
-    private OptionItemVo deliveryMethodItem;
+    private String deliveryMethod;
 
     /**
      * 备注

@@ -28,7 +28,7 @@ public class BusinessOrderDetailVo extends BaseVo {
      * 所属客户
      */
     @ExcelProperty(value = "所属客户")
-    private OptionItemVo user;
+    private String userId;
 
     /**
      * 订单类型

@@ -2,7 +2,6 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
-import com.jdcloud.sdk.annotation.QueryParameter;
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -19,7 +18,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.vo.ShipmentNoticeVo;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
 import com.ruoyi.wms.service.ShipmentNoticeService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -44,7 +43,8 @@ public class ShipmentNoticeController extends BaseController {
     @SaCheckPermission("wms:shipmentNotice:list")
     @GetMapping("/list")
     public TableDataInfo<ShipmentNoticeVo> list(ShipmentNoticeBo bo, PageQuery pageQuery) {
-        return shipmentNoticeService.queryPageList(bo, pageQuery);
+//        return shipmentNoticeService.queryPageList(bo, pageQuery);
+        return shipmentNoticeService.queryShipmentNoticeList(bo, pageQuery);
     }
 
     /**
