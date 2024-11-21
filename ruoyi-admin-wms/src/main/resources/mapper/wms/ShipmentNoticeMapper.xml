@@ -4,11 +4,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wms.mapper.ShipmentNoticeMapper">
     <resultMap id="ShipmentNoticeResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo">
+        <id property="id" column="id" />
         <collection property="merchandises" column="id" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo"
                     select="selectShipmentNoticeMerchandise"/>
     </resultMap>
 
     <resultMap id="ShipmentNoticeDetailResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo">
+        <id property="id" column="id" />
         <collection property="merchandises" column="{orderId = order_id, id = id}" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo"
                     select="selectShipmentNoticeDetailMerchandise"/>
     </resultMap>

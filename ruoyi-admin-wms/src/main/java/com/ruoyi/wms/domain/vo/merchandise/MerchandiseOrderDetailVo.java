@@ -27,6 +27,12 @@ public class MerchandiseOrderDetailVo extends MerchandiseVo {
     private static final long serialVersionUID = 1L;
 
     /**
+     * 选项
+     */
+    @ExcelProperty(value = "选项")
+    private String labelOption;
+
+    /**
      * 订单需求数量
      */
     @ExcelProperty(value = "订单需求数量")

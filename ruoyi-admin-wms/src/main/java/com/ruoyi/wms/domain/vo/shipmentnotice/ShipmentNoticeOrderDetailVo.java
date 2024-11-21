@@ -6,6 +6,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
+import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
