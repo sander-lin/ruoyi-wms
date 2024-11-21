@@ -3,6 +3,7 @@ package com.ruoyi.wms.controller;
 import java.util.List;
 
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -65,7 +66,7 @@ public class ShipmentNoticeController extends BaseController {
      */
     @SaCheckPermission("wms:shipmentNotice:query")
     @GetMapping("/{id}")
-    public R<ShipmentNoticeVo> getInfo(@NotNull(message = "主键不能为空")
+    public R<ShipmentNoticeDetailVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable String id) {
         return R.ok(shipmentNoticeService.queryById(id));
     }

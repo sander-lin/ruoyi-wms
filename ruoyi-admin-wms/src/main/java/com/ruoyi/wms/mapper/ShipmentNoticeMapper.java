@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.system.domain.entity.SysPost;
 import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
@@ -19,6 +20,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ShipmentNoticeMapper extends BaseMapperPlus<ShipmentNotice, ShipmentNoticeVo> {
     Page<ShipmentNoticeVo> selectShipmentNoticeVoList(Page<ShipmentNoticeVo> page, @Param(Constants.WRAPPER) Wrapper<ShipmentNotice> queryWrapper);
-    ShipmentNoticeVo selectShipmentNoticeById(@Param("id") long id);
+    ShipmentNoticeDetailVo selectShipmentNoticeById(@Param("id") long id);
 }
 

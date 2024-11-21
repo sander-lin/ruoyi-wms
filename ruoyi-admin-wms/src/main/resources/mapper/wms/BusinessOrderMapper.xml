@@ -27,11 +27,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
         <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo"
                     select="selectMerchandiseListByOrderId" column="order_id"/>
-        <collection property="shipmentNotices" ofType="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo"
+        <collection property="shipmentNotices" ofType="com.ruoyi.wms.domain.vo.businessorder.ShipmentNoticeOrderDetailVo"
                     select="selectShipmentNoticeByOrderId" column="order_id" />
     </resultMap>
 
-    <resultMap id="ShipmentNoticeResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo">
+    <resultMap id="ShipmentNoticeResMap" type="com.ruoyi.wms.domain.vo.businessorder.ShipmentNoticeOrderDetailVo">
         <id property="id" column="shipment_notice_id" />
         <result property="tag" column="tag" />
         <result property="status" column="status" />
