@@ -10,7 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.MerchandiseBo;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.mapper.MerchandiseMapper;
 

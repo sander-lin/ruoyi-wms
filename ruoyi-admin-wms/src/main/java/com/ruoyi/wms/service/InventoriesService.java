@@ -11,21 +11,12 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.InventoriesBo;
 import com.ruoyi.wms.domain.bo.BatchInventoriesBo;
-import com.ruoyi.wms.domain.bo.InventoryBo;
-import com.ruoyi.wms.domain.bo.MerchandiseBo;
 import com.ruoyi.wms.domain.vo.InventoriesVo;
-import com.ruoyi.wms.domain.vo.InventoryVo;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
 import com.ruoyi.wms.domain.entity.Inventories;
-import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.mapper.InventoriesMapper;
-
-import io.micrometer.common.lang.Nullable;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.ArrayList;
 import java.util.Collection;
 
 /**

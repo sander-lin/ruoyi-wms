@@ -19,4 +19,6 @@ import org.apache.ibatis.annotations.Param;
  */
 public interface ShipmentNoticeMapper extends BaseMapperPlus<ShipmentNotice, ShipmentNoticeVo> {
     Page<ShipmentNoticeVo> selectShipmentNoticeVoList(Page<ShipmentNoticeVo> page, @Param(Constants.WRAPPER) Wrapper<ShipmentNotice> queryWrapper);
+    ShipmentNoticeVo selectShipmentNoticeById(@Param("id") long id);
 }
+

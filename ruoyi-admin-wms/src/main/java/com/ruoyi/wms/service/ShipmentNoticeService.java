@@ -42,7 +42,7 @@ public class ShipmentNoticeService {
      * 查询发货请求通知单
      */
     public ShipmentNoticeVo queryById(String id){
-        return shipmentNoticeMapper.selectVoById(id);
+        return shipmentNoticeMapper.selectShipmentNoticeById(Long.parseLong(id));
     }
 
 

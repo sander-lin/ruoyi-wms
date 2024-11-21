@@ -3,15 +3,11 @@ package com.ruoyi.wms.domain.vo.businessorder;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.mybatis.core.domain.BaseVo;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
-import com.ruoyi.wms.domain.vo.OptionItemVo;
-import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo;
-import io.github.linpeilie.annotations.AutoMapper;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -56,5 +52,5 @@ public class BusinessOrderDetailVo extends BaseVo {
 
     private List<MerchandiseVo> merchandises;
 
-    private List<ShipmentNoticeOrderDetailVo> shipmentNotices;
+    private List<MerchandiseOrderDetailVo> shipmentNotices;
 }

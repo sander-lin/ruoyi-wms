@@ -3,13 +3,12 @@ package com.ruoyi.wms.domain.vo.shipmentnotice;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.mybatis.core.domain.BaseVo;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
-import com.ruoyi.wms.domain.vo.OptionItemVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.util.List;
 
 @Data
@@ -56,5 +55,5 @@ public class ShipmentNoticeOrderDetailVo extends BaseVo {
     @ExcelProperty(value = "备注")
     private String remark;
 
-    private List<MerchandiseVo> merchandises;
+    private List<MerchandiseNoticeDetailVo> merchandises;
 }

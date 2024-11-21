@@ -12,24 +12,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="totalAmount" column="total_amount" />
         <result property="createTime" column="create_time" />
 
-        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo"
                     select="selectMerchandiseList" column="order_id"/>
-    </resultMap>
-
-    <resultMap id="MerchandiseResMap" type="com.ruoyi.wms.domain.vo.MerchandiseVo">
-        <id property="id" column="id" />
-        <result property="name" column="name" />
-        <result property="fnsku" column="fnsku" />
-        <result property="asin" column="asin" />
-        <result property="size" column="size" />
-        <result property="color" column="color" />
-        <result property="type" column="type" />
-        <result property="image" column="image" />
-        <result property="price" column="price" />
-        <result property="quantityRequired" column="quantity_required" />
-        <result property="quantityShipped" column="quantity_shipped" />
-        <result property="quantityNotice" column="quantity_notice" />
-        <result property="labelOption" column="label_option" />
     </resultMap>
 
     <resultMap id="OrderDetailResMap" type="com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo">
@@ -41,7 +25,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="totalAmount" column="total_amount" />
         <result property="createTime" column="create_time" />
 
-        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo"
                     select="selectMerchandiseListByOrderId" column="order_id"/>
         <collection property="shipmentNotices" ofType="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo"
                     select="selectShipmentNoticeByOrderId" column="order_id" />
@@ -54,7 +38,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <result property="deliveryMethod" column="delivery_method" />
         <result property="createTime" column="create_time" />
 
-        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo"
                     select="selectMerchandiseListByShipmentNoticeId" column="shipment_notice_id"/>
     </resultMap>
 
@@ -69,7 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         inner join merchandise m on m.id = om.merchandise_id
     </sql>
 
-    <select id="selectMerchandiseList" resultMap="MerchandiseResMap">
+    <select id="selectMerchandiseList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderVo">
         select
             om.quantity_required,
             m.*,
@@ -80,7 +64,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where om.order_id = #{order_id}
     </select>
 
-    <select id="selectMerchandiseListByOrderId" resultMap="MerchandiseResMap">
+    <select id="selectMerchandiseListByOrderId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo">
         SELECT DISTINCT
             m.id,
             m.asin,
@@ -91,8 +75,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             m.price,
             m.size,
             m.type,
+            m.user_id,
             om.label_option,
-            sqs.quantity_shipped,
+            sqs.quantity_shipped total_quantity_shipped,
             om.quantity_required
         FROM (select
                 *
@@ -118,7 +103,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ) sqs on sqs.merchandise_id = m.id
     </select>
 
-    <select id="selectMerchandiseListByShipmentNoticeId" resultMap="MerchandiseResMap">
+    <select id="selectMerchandiseListByShipmentNoticeId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo">
         select distinct
             m.id,
             m.asin,
@@ -129,6 +114,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             m.price,
             m.size,
             m.type,
+            m.user_id,
             om.label_option,
             om.quantity_required,
             snm.quantity_notice

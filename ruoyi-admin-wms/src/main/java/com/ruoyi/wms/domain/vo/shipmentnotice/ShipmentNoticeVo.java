@@ -6,12 +6,12 @@ import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
 import com.ruoyi.common.excel.annotation.ExcelDictFormat;
 import com.ruoyi.common.excel.convert.ExcelDictConvert;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.EqualsAndHashCode;
 
-import java.io.Serializable;
 import java.io.Serial;
 import java.util.List;
 
@@ -73,5 +73,5 @@ public class ShipmentNoticeVo extends BaseVo {
     @ExcelProperty(value = "备注")
     private String remark;
 
-    private List<MerchandiseVo> merchandises;
+    private List<MerchandiseNoticeVo> merchandises;
 }

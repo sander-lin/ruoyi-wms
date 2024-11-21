@@ -5,7 +5,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 <mapper namespace="com.ruoyi.wms.mapper.InventoriesMapper">
     <resultMap id="inventoriesVoMap" type="com.ruoyi.wms.domain.vo.InventoriesVo">
 
-        <association property="merchandise" javaType="com.ruoyi.wms.domain.vo.MerchandiseVo" >
+        <association property="merchandise" javaType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo" >
             <id property="id" column="mer_id" />
         </association>
     </resultMap>

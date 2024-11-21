@@ -3,8 +3,7 @@ package com.ruoyi.wms.domain.vo;
 import com.ruoyi.wms.domain.entity.Inventories;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
 

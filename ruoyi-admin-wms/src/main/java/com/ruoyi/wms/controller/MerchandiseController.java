@@ -17,7 +17,7 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.bo.MerchandiseBo;
 import com.ruoyi.wms.service.MerchandiseService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;

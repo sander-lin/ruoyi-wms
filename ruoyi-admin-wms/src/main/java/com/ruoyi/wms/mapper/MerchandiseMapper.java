@@ -1,7 +1,7 @@
 package com.ruoyi.wms.mapper;
 
 import com.ruoyi.wms.domain.entity.Merchandise;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 
 /**
