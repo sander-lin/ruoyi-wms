@@ -1,11 +1,9 @@
-package com.ruoyi.wms.domain.vo;
+package com.ruoyi.wms.domain.vo.merchandise;
 
 import java.math.BigDecimal;
 import com.ruoyi.wms.domain.entity.Merchandise;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
 
@@ -85,28 +83,4 @@ public class MerchandiseVo implements Serializable {
      */
     @ExcelProperty(value = "单价")
     private BigDecimal price;
-
-    /**
-     * 总已发数量
-     */
-    @ExcelProperty(value = "总已发数量")
-    private String quantityShipped;
-
-    /**
-     * 通知发货数量
-     */
-    @ExcelProperty(value = "通知发货数量")
-    private String quantityNotice;
-
-    /**
-     * 订单需求数量
-     */
-    @ExcelProperty(value = "订单需求数量")
-    private String quantityRequired;
-
-    /**
-     * 选项
-     */
-    @ExcelProperty(value = "选项")
-    private String labelOption;
 }

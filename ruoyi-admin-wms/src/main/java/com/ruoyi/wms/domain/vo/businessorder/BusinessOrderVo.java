@@ -4,14 +4,12 @@
  import com.ruoyi.wms.domain.entity.BusinessOrder;
  import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
  import com.alibaba.excel.annotation.ExcelProperty;
- import com.ruoyi.wms.domain.vo.MerchandiseVo;
- import com.ruoyi.wms.domain.vo.OptionItemVo;
- import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo;
+ import com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderVo;
+ import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
  import lombok.Data;
  import io.github.linpeilie.annotations.AutoMapper;
+ import lombok.EqualsAndHashCode;
 
- import java.io.Serializable;
- import java.io.Serial;
  import java.util.List;
 
  /**
@@ -22,6 +20,7 @@
   */
  @Data
  @ExcelIgnoreUnannotated
+ @EqualsAndHashCode(callSuper = true)
  @AutoMapper(target = BusinessOrder.class)
  public class BusinessOrderVo extends BaseVo {
      /**
@@ -34,7 +33,7 @@
       * 所属客户
       */
      @ExcelProperty(value = "所属客户")
-     private OptionItemVo user;
+     private String userId;
 
      /**
       * 订单类型
@@ -60,8 +59,5 @@
      @ExcelProperty(value = "备注")
      private String remark;
 
-     private List<MerchandiseVo> merchandises;
-
-    private List<ShipmentNoticeOrderDetailVo> shipmentNotices;
-
+     private List<MerchandiseOrderVo> merchandises;
  }

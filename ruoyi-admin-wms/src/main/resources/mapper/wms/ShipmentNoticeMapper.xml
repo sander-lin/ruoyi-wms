@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wms.mapper.ShipmentNoticeMapper">
+    <resultMap id="ShipmentNoticeResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo">
+        <id property="id" column="id" />
+        <collection property="merchandises" column="id" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo"
+                    select="selectShipmentNoticeMerchandise"/>
+    </resultMap>
+
+    <resultMap id="ShipmentNoticeDetailResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo">
+        <id property="id" column="id" />
+        <collection property="merchandises" column="{orderId = order_id, id = id}" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo"
+                    select="selectShipmentNoticeDetailMerchandise"/>
+    </resultMap>
+
+
+
+    <select id="selectShipmentNoticeVoList" resultMap="ShipmentNoticeResMap">
+        select
+            *
+        from shipment_notice ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="selectShipmentNoticeMerchandise" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo">
+        select
+            m.*,
+            snm.quantity_notice
+        from shipment_notice_merchandise snm
+        inner join merchandise m on m.id = snm.merchandise_id
+        where snm.shipment_notice_id = #{id}
+    </select>
+
+    <select id="selectShipmentNoticeById" resultMap="ShipmentNoticeDetailResMap">
+        select *
+        from shipment_notice
+        where id = #{id}
+    </select>
+
+    <select id="selectShipmentNoticeDetailMerchandise" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo">
+        select distinct
+            m.*,
+            om.label_option,
+            snm.quantity_notice,
+            sqn.total_quantity_notice
+        from shipment_notice_merchandise snm
+        inner join merchandise m on m.id = snm.merchandise_id
+        inner join order_merchandise om on om.order_id = #{orderId} and om.merchandise_id = snm.merchandise_id
+        inner join (
+            select
+                merchandise_id,
+                sum(quantity_notice) total_quantity_notice
+            from (
+                select
+                    *
+                from shipment_notice
+                where order_id = #{orderId}
+            ) sn
+            inner join shipment_notice_merchandise snm2 on snm2.shipment_notice_id = sn.id
+            group by merchandise_id
+        ) sqn on sqn.merchandise_id = snm.merchandise_id
+        where snm.shipment_notice_id = #{id}
+    </select>
+</mapper>

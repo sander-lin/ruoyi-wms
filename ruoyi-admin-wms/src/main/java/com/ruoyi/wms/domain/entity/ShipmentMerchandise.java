@@ -10,15 +10,15 @@ import java.io.Serial;
 import java.io.Serializable;
 
 /**
- * 订单商品关系对象 order_merchandise
+ * 发货单商品关系对象 shipment_merchandise
  *
- * @author hw
- * @date 2024-11-15
+ * @author Huiwei
+ * @date 2024-11-19
  */
 @Data
-@EqualsAndHashCode()
-@TableName("order_merchandise")
-public class OrderMerchandise implements Serializable {
+@EqualsAndHashCode(callSuper = false)
+@TableName("shipment_merchandise")
+public class ShipmentMerchandise implements Serializable {
 
     @Serial
     private static final long serialVersionUID=1L;
@@ -29,33 +29,13 @@ public class OrderMerchandise implements Serializable {
     @TableId(value = "id")
     private String id;
     /**
-     * 订单id
-     */
-    private String orderId;
-    /**
      * 商品id
      */
     private String merchandiseId;
     /**
-     * 发货通知单id
-     */
-    private String shipmentNoticeId;
-    /**
      * 发货单id
      */
     private String shipmentId;
-    /**
-     * 选项
-     */
-    private String labelOption;
-    /**
-     * 需求数量
-     */
-    private String quantityRequired;
-    /**
-     * 通知数量
-     */
-    private String quantityNotice;
     /**
      * 已发数量
      */

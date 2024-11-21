@@ -6,54 +6,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap id="OrderResMap" type="com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo">
         <id property="id" column="order_id" />
         <result property="type" column="type" />
+        <result property="userId" column="user_id" />
         <result property="status" column="status" />
         <result property="remark" column="remark" />
         <result property="totalAmount" column="total_amount" />
         <result property="createTime" column="create_time" />
 
-        <association property="user" javaType="com.ruoyi.wms.domain.vo.OptionItemVo" column="user_id" select="selectUser" />
-
-        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo"
                     select="selectMerchandiseList" column="order_id"/>
-    </resultMap>
-
-    <resultMap id="MerchandiseResMap" type="com.ruoyi.wms.domain.vo.MerchandiseVo">
-        <id property="id" column="id" />
-        <result property="name" column="name" />
-        <result property="fnsku" column="fnsku" />
-        <result property="asin" column="asin" />
-        <result property="size" column="size" />
-        <result property="color" column="color" />
-        <result property="type" column="type" />
-        <result property="image" column="image" />
-        <result property="price" column="price" />
-        <result property="quantityRequired" column="quantity_required" />
-        <result property="quantityShipped" column="quantity_shipped" />
-        <result property="quantityNotice" column="quantity_notice" />
-        <result property="labelOption" column="label_option" />
-    </resultMap>
-
-    <resultMap id="UserOptionResMap" type="com.ruoyi.wms.domain.vo.OptionItemVo">
-        <id property="value" column="user_id" />
-        <result property="key" column="user_name" />
-    </resultMap>
-
-    <resultMap id="DeliveryMethodOptionResMap" type="com.ruoyi.wms.domain.vo.OptionItemVo">
-        <id property="value" column="id" />
-        <result property="key" column="name" />
     </resultMap>
 
     <resultMap id="OrderDetailResMap" type="com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo">
         <id property="id" column="order_id" />
         <result property="type" column="type" />
         <result property="status" column="status" />
+        <result property="userId" column="user_id" />
         <result property="remark" column="remark" />
         <result property="totalAmount" column="total_amount" />
         <result property="createTime" column="create_time" />
 
-        <association property="user" javaType="com.ruoyi.wms.domain.vo.OptionItemVo" column="user_id" select="selectUser" />
-
-        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo"
                     select="selectMerchandiseListByOrderId" column="order_id"/>
         <collection property="shipmentNotices" ofType="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeOrderDetailVo"
                     select="selectShipmentNoticeByOrderId" column="order_id" />
@@ -63,11 +35,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <id property="id" column="shipment_notice_id" />
         <result property="tag" column="tag" />
         <result property="status" column="status" />
+        <result property="deliveryMethod" column="delivery_method" />
         <result property="createTime" column="create_time" />
 
-        <association property="deliveryMethodItem" javaType="com.ruoyi.wms.domain.vo.OptionItemVo" column="delivery_method" select="selectDeliveryMethodItem" />
-
-        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.MerchandiseVo"
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo"
                     select="selectMerchandiseListByShipmentNoticeId" column="shipment_notice_id"/>
     </resultMap>
 
@@ -82,7 +53,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         inner join merchandise m on m.id = om.merchandise_id
     </sql>
 
-    <select id="selectMerchandiseList" resultMap="MerchandiseResMap">
+    <select id="selectMerchandiseList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderVo">
         select
             om.quantity_required,
             m.*,
@@ -93,52 +64,65 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where om.order_id = #{order_id}
     </select>
 
-    <select id="selectMerchandiseListByOrderId" resultMap="MerchandiseResMap">
+    <select id="selectMerchandiseListByOrderId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo">
+        SELECT DISTINCT
+            m.id,
+            m.asin,
+            m.color,
+            m.fnsku,
+            m.image,
+            m.`name`,
+            m.price,
+            m.size,
+            m.type,
+            m.user_id,
+            om.label_option,
+            sqs.quantity_shipped total_quantity_shipped,
+            om.quantity_required
+        FROM (select
+                *
+            from business_order
+            where id = #{order_id}
+        ) bo
+        JOIN order_merchandise om on om.order_id = bo.id
+        JOIN merchandise m on m.id = om.merchandise_id
+        LEFT JOIN (
+            SELECT DISTINCT
+                sm.merchandise_id,
+                SUM(sm.quantity_shipped) quantity_shipped
+            FROM (
+                SELECT
+                    *
+                FROM shipment_notice
+                WHERE order_id =  #{order_id}
+            ) sn
+            JOIN shipment_notice_merchandise snm ON snm.shipment_notice_id = sn.id
+            JOIN shipment s on s.shipment_notice_id = snm.shipment_notice_id
+            JOIN shipment_merchandise sm ON sm.shipment_id = s.id
+            GROUP BY sm.merchandise_id
+        ) sqs on sqs.merchandise_id = m.id
+    </select>
+
+    <select id="selectMerchandiseListByShipmentNoticeId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo">
         select distinct
-            m.*,
+            m.id,
+            m.asin,
+            m.color,
+            m.fnsku,
+            m.image,
+            m.`name`,
+            m.price,
+            m.size,
+            m.type,
+            m.user_id,
             om.label_option,
             om.quantity_required,
-            om.quantity_notice,
-            sqs.quantity_shipped
-        from (
-            select
-                order_id,
-                merchandise_id,
-                sum(om2.quantity_shipped) quantity_shipped
-            from order_merchandise om2
-            where om2.order_id = #{order_id}
-            group by om2.merchandise_id,om2.order_id
-        ) sqs
-        inner join order_merchandise om on om.order_id = sqs.order_id and sqs.merchandise_id = om.merchandise_id
-        inner join merchandise m on m.id = sqs.merchandise_id
-        inner join business_order bo on bo.id = sqs.order_id
-    </select>
-
-    <select id="selectMerchandiseListByShipmentNoticeId" resultMap="MerchandiseResMap">
-        select
-            m.*,
-            om.label_option,
-            om.quantity_required,
-            om.quantity_notice
+            snm.quantity_notice
         from shipment_notice sn
-        inner join order_merchandise om on om.shipment_notice_id = sn.id
-        inner join merchandise m on m.id = om.merchandise_id
+        inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+        inner join order_merchandise om on om.order_id = sn.order_id AND om.merchandise_id = snm.merchandise_id
+        inner join merchandise m on m.id = snm.merchandise_id
         where sn.id = #{shipment_notice_id}
-    </select>
-
-    <select id="selectDeliveryMethodItem" resultMap="DeliveryMethodOptionResMap">
-        select
-            name,
-            id
-        from logistics_channel
-        where id = #{delivery_method}
-    </select>
-    <select id="selectUser" resultMap="UserOptionResMap">
-        select
-            user_id,
-            user_name
-        from sys_user
-        where user_id = #{user_id}
     </select>
 
     <select id="selectOrderList" resultMap="OrderResMap">

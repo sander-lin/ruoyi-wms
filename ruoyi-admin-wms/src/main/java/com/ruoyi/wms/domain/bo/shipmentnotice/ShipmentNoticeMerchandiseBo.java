@@ -1,13 +1,12 @@
- package com.ruoyi.wms.domain.bo.businessorder;
+ package com.ruoyi.wms.domain.bo.shipmentnotice;
 
- import com.ruoyi.wms.domain.entity.OrderMerchandise;
  import com.ruoyi.common.core.validate.AddGroup;
  import com.ruoyi.common.core.validate.EditGroup;
- import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+ import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
+ import io.github.linpeilie.annotations.AutoMapper;
+ import jakarta.validation.constraints.NotBlank;
  import lombok.Data;
  import lombok.EqualsAndHashCode;
- import jakarta.validation.constraints.*;
- import io.github.linpeilie.annotations.AutoMapper;
 
  import java.io.Serial;
  import java.io.Serializable;
@@ -22,8 +21,8 @@
 
  @Data
  @EqualsAndHashCode(callSuper=false)
- @AutoMapper(target = OrderMerchandise.class, reverseConvertGenerate = false)
- public class OrderMerchandiseBo implements Serializable {
+ @AutoMapper(target = ShipmentNoticeMerchandise.class, reverseConvertGenerate = false)
+ public class ShipmentNoticeMerchandiseBo implements Serializable {
 
      @Serial
      private static final long serialVersionUID = 1L;
@@ -40,14 +39,15 @@
      private String merchandiseId;
 
      /**
-      * 需求数量
+      * 请求通知单id
       */
-     @NotBlank(message = "需求数量不能为空", groups = { AddGroup.class, EditGroup.class })
-     private String quantityRequired;
+     private String shipmentNoticeId;
 
      /**
-      * 选项
+      * 需求数量
       */
-     @NotBlank(message = "选项不能为空", groups = { AddGroup.class, EditGroup.class })
-     private String labelOption;
+     @NotBlank(message = "请求通知数量不能为空", groups = { AddGroup.class, EditGroup.class })
+     private String quantityNotice;
+
  }
+

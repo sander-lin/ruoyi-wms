@@ -2,13 +2,10 @@ package com.ruoyi.wms.mapper;
 
 import com.ruoyi.wms.domain.entity.Inventories;
 import com.ruoyi.wms.domain.vo.InventoriesVo;
-import com.ruoyi.wms.domain.vo.MerchandiseVo;
 import com.ruoyi.wms.domain.bo.InventoriesBo;
-import com.ruoyi.wms.domain.bo.MerchandiseBo;
 
 import org.apache.ibatis.annotations.Param;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 import java.util.List;
