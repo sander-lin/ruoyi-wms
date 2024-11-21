@@ -2,20 +2,34 @@ package com.ruoyi.wms.domain.vo.shipmentnotice;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.ruoyi.common.excel.annotation.ExcelDictFormat;
+import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import com.ruoyi.common.mybatis.core.domain.BaseVo;
+import com.ruoyi.wms.domain.entity.ShipmentNotice;
+import com.ruoyi.wms.domain.vo.ShipmentVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo;
-import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo;
-import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.io.Serial;
 import java.util.List;
 
+/**
+ * 发货请求通知单视图对象 shipment_notice
+ *
+ * @author huiwei
+ * @date 2024-11-18
+ */
 @Data
 @ExcelIgnoreUnannotated
+@AutoMapper(target = ShipmentNotice.class)
 @EqualsAndHashCode(callSuper = true)
-public class ShipmentNoticeOrderDetailVo extends BaseVo {
+public class ShipmentNoticeDetailVo extends BaseVo {
+
+    @Serial
+    private static final long serialVersionUID = 1L;
+
     /**
      *
      */
@@ -29,8 +43,9 @@ public class ShipmentNoticeOrderDetailVo extends BaseVo {
     private String orderId;
 
     /**
-     * 所属客户
+     *
      */
+    @ExcelProperty(value = "")
     private String userId;
 
     /**
@@ -48,6 +63,8 @@ public class ShipmentNoticeOrderDetailVo extends BaseVo {
     /**
      * 配送方式（物流渠道）
      */
+    @ExcelProperty(value = "配送方式", converter = ExcelDictConvert.class)
+    @ExcelDictFormat(readConverterExp = "物=流渠道")
     private String deliveryMethod;
 
     /**
@@ -57,4 +74,6 @@ public class ShipmentNoticeOrderDetailVo extends BaseVo {
     private String remark;
 
     private List<MerchandiseNoticeDetailVo> merchandises;
+
+    private List<ShipmentVo> shipments;
 }

@@ -9,10 +9,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     select="selectShipmentNoticeMerchandise"/>
     </resultMap>
 
-    <resultMap id="ShipmentNoticeDetailResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo">
+    <resultMap id="ShipmentNoticeDetailResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo">
         <id property="id" column="id" />
         <collection property="merchandises" column="{orderId = order_id, id = id}" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo"
                     select="selectShipmentNoticeDetailMerchandise"/>
+        <collection property="shipments" column="id" ofType="com.ruoyi.wms.domain.vo.ShipmentVo"
+                    select="selectShipmentList"/>
     </resultMap>
 
 
@@ -61,5 +63,12 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             group by merchandise_id
         ) sqn on sqn.merchandise_id = snm.merchandise_id
         where snm.shipment_notice_id = #{id}
+    </select>
+
+    <select id="selectShipmentList" resultType="com.ruoyi.wms.domain.vo.ShipmentVo">
+        select
+            *
+        from shipment
+        where shipment_notice_id = #{id}
     </select>
 </mapper>

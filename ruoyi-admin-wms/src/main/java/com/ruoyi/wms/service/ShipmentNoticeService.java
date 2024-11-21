@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeMerchandiseBo;
 import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +42,7 @@ public class ShipmentNoticeService {
     /**
      * 查询发货请求通知单
      */
-    public ShipmentNoticeVo queryById(String id){
+    public ShipmentNoticeDetailVo queryById(String id){
         return shipmentNoticeMapper.selectShipmentNoticeById(Long.parseLong(id));
     }
 
