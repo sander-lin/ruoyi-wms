@@ -9,6 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeMerchandiseBo;
+import com.ruoyi.wms.domain.entity.OrderMerchandise;
 import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
@@ -95,14 +96,18 @@ public class ShipmentNoticeService {
             merchandise.setOrderId(bo.getOrderId());
             merchandise.setShipmentNoticeId(shipmentNoticeId);
 
-            if(!checkMerchandiseInOrder(merchandise)) throw new RuntimeException("订单不存在该商品！") ;
+            if(!checkMerchandiseInOrder(merchandise))
+                throw new RuntimeException(merchandise.getMerchandiseId() + " 订单不存在该商品！") ;
 
             shipmentNoticeMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
         });
     }
 
-    private Boolean checkMerchandiseInOrder(ShipmentNoticeMerchandiseBo Bo) {
-        int count = orderMerchandiseMapper.checkMerchandiseInOrder(Bo);
+    private Boolean checkMerchandiseInOrder(ShipmentNoticeMerchandiseBo bo) {
+        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),OrderMerchandise::getMerchandiseId,bo.getMerchandiseId());
+        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),OrderMerchandise::getOrderId,bo.getOrderId());
+        long count = orderMerchandiseMapper.selectCount(lqw);
         return count > 0;
     }
 

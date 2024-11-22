@@ -9,23 +9,18 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipment.NewShipmentBo;
-import com.ruoyi.wms.domain.entity.Inventories;
-import com.ruoyi.wms.domain.entity.ShipmentMerchandise;
-import com.ruoyi.wms.domain.entity.ShipmentNotice;
+import com.ruoyi.wms.domain.bo.shipment.ShipmentMerchandiseBo;
+import com.ruoyi.wms.domain.entity.*;
 import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
-import com.ruoyi.wms.mapper.InventoriesMapper;
-import com.ruoyi.wms.mapper.ShipmentMerchandiseMapper;
-import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
+import com.ruoyi.wms.mapper.*;
 import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.shipment.ShipmentBo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
-import com.ruoyi.wms.domain.entity.Shipment;
-import com.ruoyi.wms.mapper.ShipmentMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
@@ -47,6 +42,7 @@ public class ShipmentService {
     private final InventoriesMapper inventoriesMapper;
     private final ShipmentMerchandiseMapper shipmentMerchandiseMapper;
     private final ShipmentNoticeMapper shipmentNoticeMapper;
+    private final ShipmentNoticeMerchandiseMapper shipmentNoticeMerchandiseMapper;
 
     /**
      * 查询发货管理
@@ -99,6 +95,8 @@ public class ShipmentService {
 
             merchandise.setShipmentId(add.getId());
             merchandise.setShipmentNoticeId(bo.getShipmentNoticeId());
+            if(!checkMerchandiseInShipmentNotice(merchandise))
+                throw new RuntimeException(merchandise.getMerchandiseId() + " 通知单不存在该商品！") ;
 
             shipmentMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentMerchandise.class));
 
@@ -139,6 +137,14 @@ public class ShipmentService {
             shipmentNoticeMapper.updateById(MapstructUtils.convert(shipmentNoticeBo,ShipmentNotice.class));
         }
 
+    }
+
+    private Boolean checkMerchandiseInShipmentNotice(ShipmentMerchandiseBo bo) {
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),ShipmentNoticeMerchandise::getMerchandiseId,bo.getMerchandiseId());
+        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),ShipmentNoticeMerchandise::getShipmentNoticeId,bo.getShipmentNoticeId());
+        long count = shipmentNoticeMerchandiseMapper.selectCount(lqw);
+        return count > 0;
     }
 
     @Getter

@@ -13,5 +13,4 @@ import org.apache.ibatis.annotations.Param;
  * @date 2024-11-15
  */
 public interface OrderMerchandiseMapper extends BaseMapperPlus<OrderMerchandise, OrderMerchandiseBo> {
-    int checkMerchandiseInOrder(@Param("bo") ShipmentNoticeMerchandiseBo bo);
 }
