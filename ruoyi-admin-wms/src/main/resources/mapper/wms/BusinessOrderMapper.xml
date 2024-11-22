@@ -80,26 +80,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             sqs.quantity_shipped total_quantity_shipped,
             om.quantity_required
         FROM (select
-                *
+                id
             from business_order
             where id = #{order_id}
         ) bo
-        JOIN order_merchandise om on om.order_id = bo.id
-        JOIN merchandise m on m.id = om.merchandise_id
-        LEFT JOIN (
+        inner join order_merchandise om on om.order_id = bo.id
+        inner join merchandise m on m.id = om.merchandise_id
+        left join (
             SELECT DISTINCT
                 sm.merchandise_id,
                 SUM(sm.quantity_shipped) quantity_shipped
             FROM (
                 SELECT
-                    *
+                    id
                 FROM shipment_notice
-                WHERE order_id =  #{order_id}
+                WHERE order_id = #{order_id}
             ) sn
-            JOIN shipment_notice_merchandise snm ON snm.shipment_notice_id = sn.id
-            JOIN shipment s on s.shipment_notice_id = snm.shipment_notice_id
-            JOIN shipment_merchandise sm ON sm.shipment_id = s.id
-            GROUP BY sm.merchandise_id
+            inner join shipment_notice_merchandise snm ON snm.shipment_notice_id = sn.id
+            inner join shipment s on s.shipment_notice_id = snm.shipment_notice_id
+            inner join shipment_merchandise sm ON sm.shipment_id = s.id
+            group by sm.merchandise_id
         ) sqs on sqs.merchandise_id = m.id
     </select>
 

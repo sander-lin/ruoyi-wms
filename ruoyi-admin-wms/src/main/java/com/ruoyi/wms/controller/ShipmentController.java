@@ -2,6 +2,8 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
+import com.ruoyi.wms.domain.bo.shipment.NewShipmentBo;
+import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -17,8 +19,8 @@ import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.vo.ShipmentVo;
-import com.ruoyi.wms.domain.bo.ShipmentBo;
+import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
+import com.ruoyi.wms.domain.bo.shipment.ShipmentBo;
 import com.ruoyi.wms.service.ShipmentService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
@@ -63,7 +65,7 @@ public class ShipmentController extends BaseController {
      */
     @SaCheckPermission("wms:shipment:query")
     @GetMapping("/{id}")
-    public R<ShipmentVo> getInfo(@NotNull(message = "主键不能为空")
+    public R<ShipmentDetailVo> getInfo(@NotNull(message = "id不能为空")
                                      @PathVariable String id) {
         return R.ok(shipmentService.queryById(id));
     }
@@ -75,7 +77,7 @@ public class ShipmentController extends BaseController {
     @Log(title = "发货管理", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping()
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody ShipmentBo bo) {
+    public R<Void> add(@Validated(AddGroup.class) @RequestBody NewShipmentBo bo) {
         shipmentService.insertByBo(bo);
         return R.ok();
     }

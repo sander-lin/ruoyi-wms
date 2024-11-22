@@ -1,13 +1,15 @@
-package com.ruoyi.wms.domain.bo;
+package com.ruoyi.wms.domain.bo.shipment;
 
-import com.ruoyi.wms.domain.entity.Shipment;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.wms.domain.entity.Shipment;
+import io.github.linpeilie.annotations.AutoMapper;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import jakarta.validation.constraints.*;
-import io.github.linpeilie.annotations.AutoMapper;
+
+import java.util.List;
 
 
 /**
@@ -20,10 +22,10 @@ import io.github.linpeilie.annotations.AutoMapper;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = Shipment.class, reverseConvertGenerate = false)
-public class ShipmentBo extends BaseEntity {
+public class NewShipmentBo extends BaseEntity {
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "不能为空", groups = { EditGroup.class })
     private String id;
@@ -55,8 +57,7 @@ public class ShipmentBo extends BaseEntity {
     /**
      * 物流单号
      */
-    @NotBlank(message = "物流单号不能为空", groups = { AddGroup.class, EditGroup.class })
     private String logisticsNumber;
 
-
+    private List<ShipmentMerchandiseBo> merchandises;
 }

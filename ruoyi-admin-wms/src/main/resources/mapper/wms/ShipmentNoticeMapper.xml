@@ -13,7 +13,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <id property="id" column="id" />
         <collection property="merchandises" column="{orderId = order_id, id = id}" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo"
                     select="selectShipmentNoticeDetailMerchandise"/>
-        <collection property="shipments" column="id" ofType="com.ruoyi.wms.domain.vo.ShipmentVo"
+        <collection property="shipments" column="id" ofType="com.ruoyi.wms.domain.vo.shipment.ShipmentVo"
                     select="selectShipmentList"/>
     </resultMap>
 
@@ -65,7 +65,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         where snm.shipment_notice_id = #{id}
     </select>
 
-    <select id="selectShipmentList" resultType="com.ruoyi.wms.domain.vo.ShipmentVo">
+    <select id="selectShipmentList" resultType="com.ruoyi.wms.domain.vo.shipment.ShipmentVo">
         select
             *
         from shipment
