@@ -46,7 +46,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.label_option,
             om.quantity_required,
             snm.quantity_notice,
-            sqn.total_quantity_shipped
+            sqs.total_quantity_shipped
         from shipment_notice_merchandise snm
         inner join merchandise m on m.id = snm.merchandise_id
         inner join order_merchandise om on om.order_id = #{orderId} and om.merchandise_id = snm.merchandise_id
