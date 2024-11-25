@@ -39,6 +39,12 @@ public class MerchandiseOrderDetailVo extends MerchandiseVo {
     private String quantityRequired;
 
     /**
+     * 订单已发通知数量
+     */
+    @ExcelProperty(value = "订单需求数量")
+    private String totalQuantityNotice;
+
+    /**
      * 总已发数量
      */
     @ExcelProperty(value = "总已发数量")

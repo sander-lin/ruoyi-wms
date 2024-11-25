@@ -41,10 +41,4 @@ public class MerchandiseShipmentDetailVo extends MerchandiseVo {
      */
     @ExcelProperty(value = "发货数量")
     private String quantityShipped;
-
-    /**
-     * 通知发货数量
-     */
-    @ExcelProperty(value = "总已发货数量(包含本次)")
-    private String totalQuantityShipped;
 }

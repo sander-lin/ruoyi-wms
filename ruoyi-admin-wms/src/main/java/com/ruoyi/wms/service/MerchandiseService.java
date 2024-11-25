@@ -7,6 +7,8 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.MerchandiseBo;
@@ -35,6 +37,24 @@ public class MerchandiseService {
      */
     public MerchandiseVo queryById(String id) {
         return merchandiseMapper.selectVoById(id);
+    }
+
+    /**
+     * 通过通知单Id查询商品
+     */
+    public TableDataInfo<MerchandiseShipmentCreatingVo> queryByShipmentNoticeId(long id, PageQuery pageQuery) {
+        Page<MerchandiseShipmentCreatingVo> result = merchandiseMapper.selectShipmentMerchandiseByShipmentNoticeId(pageQuery.build(), id);
+
+        return TableDataInfo.build(result);
+    }
+
+    /**
+     * 通过订单Id查询商品
+     */
+    public TableDataInfo<MerchandiseNoticeCreatingVo> queryByOrderId(long id, PageQuery pageQuery) {
+        Page<MerchandiseNoticeCreatingVo> result = merchandiseMapper.selectNoticeMerchandiseByOrderId(pageQuery.build(), id);
+
+        return TableDataInfo.build(result);
     }
 
     /**

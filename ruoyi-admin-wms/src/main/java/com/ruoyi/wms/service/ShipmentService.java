@@ -89,6 +89,7 @@ public class ShipmentService {
         bo.getMerchandises().forEach(merchandise -> {
             Inventories inventory = inventoriesMapper.selectByMerchandiseId(merchandise.getMerchandiseId());
 
+            if (inventory == null) throw new RuntimeException("库存中不存在该商品！");
             if (inventory.getNumber() < merchandise.getQuantityShipped()){
                 throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品库存不足！");
             }
@@ -96,7 +97,7 @@ public class ShipmentService {
             merchandise.setShipmentId(add.getId());
             merchandise.setShipmentNoticeId(bo.getShipmentNoticeId());
             if(!checkMerchandiseInShipmentNotice(merchandise))
-                throw new RuntimeException(merchandise.getMerchandiseId() + " 通知单不存在该商品！") ;
+                throw new RuntimeException(merchandise.getMerchandiseId() + " 通知单不存在该商品！");
 
             shipmentMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentMerchandise.class));
 
@@ -108,7 +109,8 @@ public class ShipmentService {
     }
 
     private void checkAndSetShipmentNoticeStatus(NewShipmentBo bo){
-        ShipmentNoticeDetailVo shipmentNotice = shipmentNoticeMapper.selectShipmentNoticeById(Long.parseLong(bo.getShipmentNoticeId()));
+        ShipmentNoticeDetailVo shipmentNotice = shipmentNoticeMapper
+            .selectShipmentNoticeById(Long.parseLong(bo.getShipmentNoticeId()));
 
         int shipmentNoticeSum = shipmentNotice.getMerchandises().stream()
             .mapToInt(merchandise -> Integer.parseInt(merchandise.getQuantityNotice().trim()))
@@ -132,17 +134,16 @@ public class ShipmentService {
             return;
         }
 
-        if( shipmentNoticeSum == shipmentShippedSum) {
-            shipmentNoticeBo.setStatus(ShipmentNoticeStatus.ALL_SHIPPED.getCode());
-            shipmentNoticeMapper.updateById(MapstructUtils.convert(shipmentNoticeBo,ShipmentNotice.class));
-        }
-
+        shipmentNoticeBo.setStatus(ShipmentNoticeStatus.ALL_SHIPPED.getCode());
+        shipmentNoticeMapper.updateById(MapstructUtils.convert(shipmentNoticeBo,ShipmentNotice.class));
     }
 
     private Boolean checkMerchandiseInShipmentNotice(ShipmentMerchandiseBo bo) {
         LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),ShipmentNoticeMerchandise::getMerchandiseId,bo.getMerchandiseId());
-        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),ShipmentNoticeMerchandise::getShipmentNoticeId,bo.getShipmentNoticeId());
+        lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),
+            ShipmentNoticeMerchandise::getMerchandiseId,bo.getMerchandiseId());
+        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),
+            ShipmentNoticeMerchandise::getShipmentNoticeId,bo.getShipmentNoticeId());
         long count = shipmentNoticeMerchandiseMapper.selectCount(lqw);
         return count > 0;
     }

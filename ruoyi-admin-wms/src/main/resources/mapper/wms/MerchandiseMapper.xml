@@ -3,5 +3,67 @@
 PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wms.mapper.MerchandiseMapper">
+    <select id="selectShipmentMerchandiseByShipmentNoticeId"
+            resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo">
+        select distinct
+            m.*,
+            om.label_option,
+            snm.quantity_Notice,
+            i.number stock,
+            sqs.total_quantity_shipped
+        from (
+            select
+                id,
+                order_id
+            from shipment_notice
+            where id = #{id}
+        ) sn
+        inner join shipment s on s.shipment_notice_id = sn.id
+        inner join shipment_merchandise sm on sm.shipment_id = s.id
+        inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id and snm.merchandise_id = sm.merchandise_id
+        inner join order_merchandise om on om.merchandise_id = sm.merchandise_id and om.order_id = sn.order_id
+        inner join merchandise m on m.id = sm.merchandise_id
+        inner join inventory i on i.merchandise_id = sm.merchandise_id
+        inner join (
+            select
+                sm2.merchandise_id,
+                sum(sm2.quantity_shipped) total_quantity_shipped
+            from shipment_notice sn2
+            inner join shipment s2 on s2.shipment_notice_id = sn2.id
+            inner join shipment_merchandise sm2 on sm2.shipment_id = s2.id
+            group by sm2.merchandise_id
+        ) sqs on sqs.merchandise_id = m.id
+    </select>
 
+    <select id="selectNoticeMerchandiseByOrderId"
+            resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo">
+        select distinct
+            m.*,
+            om.label_option,
+            om.quantity_required,
+            sqn.total_quantity_notice
+        from (
+            select
+            id,
+            order_id
+        from shipment_notice
+        where order_id = #{id}
+        ) sn
+        inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+        inner join order_merchandise om on om.order_id = sn.order_id and om.merchandise_id = snm.merchandise_id
+        inner join merchandise m on m.id = snm.merchandise_id
+        inner join (
+            select
+                merchandise_id,
+                sum(quantity_notice) total_quantity_notice
+            from (
+                select
+                    id
+                    from shipment_notice
+                    where order_id = #{id}
+                ) sn2
+            inner join shipment_notice_merchandise snm2 on snm2.shipment_notice_id = sn2.id
+            group by merchandise_id
+        ) sqn on sqn.merchandise_id = snm.merchandise_id
+    </select>
 </mapper>

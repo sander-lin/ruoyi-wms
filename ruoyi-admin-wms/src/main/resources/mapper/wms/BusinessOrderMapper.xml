@@ -77,8 +77,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             m.type,
             m.user_id,
             om.label_option,
-            sqs.quantity_shipped total_quantity_shipped,
-            om.quantity_required
+            sqs.total_quantity_shipped,
+            om.quantity_required,
+            sqn.total_quantity_notice
         FROM (select
                 id
             from business_order
@@ -86,21 +87,34 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ) bo
         inner join order_merchandise om on om.order_id = bo.id
         inner join merchandise m on m.id = om.merchandise_id
-        left join (
-            SELECT DISTINCT
+        inner join (
+            select distinct
                 sm.merchandise_id,
-                SUM(sm.quantity_shipped) quantity_shipped
-            FROM (
-                SELECT
+                SUM(sm.quantity_shipped) total_quantity_shipped
+            from (
+                select
                     id
-                FROM shipment_notice
-                WHERE order_id = #{order_id}
+                from shipment_notice
+                where order_id = #{order_id}
             ) sn
             inner join shipment_notice_merchandise snm ON snm.shipment_notice_id = sn.id
             inner join shipment s on s.shipment_notice_id = snm.shipment_notice_id
             inner join shipment_merchandise sm ON sm.shipment_id = s.id
             group by sm.merchandise_id
         ) sqs on sqs.merchandise_id = m.id
+        inner join (
+        SELECT
+            SUM(snm.quantity_notice) total_quantity_notice,
+            snm.merchandise_id
+            FROM (
+            SELECT
+            id
+            FROM shipment_notice
+            WHERE order_id = #{order_id}
+            ) sn
+            inner JOIN shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+            GROUP BY snm.merchandise_id
+        ) sqn on sqn.merchandise_id = m.id
     </select>
 
     <select id="selectMerchandiseListByShipmentNoticeId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo">
@@ -118,11 +132,15 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.label_option,
             om.quantity_required,
             snm.quantity_notice
-        from shipment_notice sn
+        from (
+            select id,order_id
+        from shipment_notice
+            where id = #{shipment_notice_id}
+        ) sn
         inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
         inner join order_merchandise om on om.order_id = sn.order_id AND om.merchandise_id = snm.merchandise_id
         inner join merchandise m on m.id = snm.merchandise_id
-        where sn.id = #{shipment_notice_id}
+
     </select>
 
     <select id="selectOrderList" resultMap="OrderResMap">
