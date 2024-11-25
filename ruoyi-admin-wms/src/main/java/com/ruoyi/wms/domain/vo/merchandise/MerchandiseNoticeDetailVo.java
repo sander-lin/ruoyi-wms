@@ -46,5 +46,5 @@ public class MerchandiseNoticeDetailVo extends MerchandiseVo {
      * 通知发货数量
      */
     @ExcelProperty(value = "总通知发货数量")
-    private String totalQuantityNotice;
+    private String totalQuantityShipped;
 }
