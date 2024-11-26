@@ -1,4 +1,4 @@
-package com.ruoyi.wms.domain.bo.businessorder;
+package com.ruoyi.wms.domain.vo;
 
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
 import com.ruoyi.common.core.validate.AddGroup;

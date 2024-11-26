@@ -7,11 +7,13 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
-import com.ruoyi.wms.domain.bo.businessorder.OrderMerchandiseVo;
+import com.ruoyi.wms.domain.entity.*;
+import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeMerchandiseBo;
-import com.ruoyi.wms.domain.entity.OrderMerchandise;
-import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
+import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
+import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
+import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
@@ -19,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
-import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -94,7 +95,7 @@ public class ShipmentNoticeService {
 
         lqw.eq(StringUtils.isNotBlank(bo.getOrderId()),OrderMerchandise::getOrderId,bo.getOrderId());
         List<OrderMerchandiseVo> orderMerchandises = orderMerchandiseMapper.selectVoList(lqw);
-
+        List<ShipmentNoticeMerchandiseVo> noticeMerchandise = selectNoticeMerchandiseByOrderId(bo.getOrderId());
         String shipmentNoticeId = add.getId();
 
         bo.getMerchandises().forEach(merchandise -> {
@@ -112,7 +113,11 @@ public class ShipmentNoticeService {
                 .orElse(initialVo)
                 .getQuantityRequired());
 
-            if(merchandise.getQuantityNotice() > compareQuantityRequired)
+            int compareQuantityNoticed = noticeMerchandise.stream()
+                .mapToInt(e-> Integer.parseInt(e.getQuantityNotice()))
+                .sum();
+
+            if(merchandise.getQuantityNotice() > (compareQuantityRequired - compareQuantityNoticed))
                 throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品通知发货数量不能超过需求数量！");
 
             shipmentNoticeMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
@@ -125,6 +130,17 @@ public class ShipmentNoticeService {
         lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),OrderMerchandise::getOrderId,bo.getOrderId());
         long count = orderMerchandiseMapper.selectCount(lqw);
         return count > 0;
+    }
+
+    public List<ShipmentNoticeMerchandiseVo> selectNoticeMerchandiseByOrderId(String id){
+        LambdaQueryWrapper<ShipmentNotice> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StringUtils.isNotBlank(id),ShipmentNotice::getOrderId,id);
+
+        List<String> ids = shipmentNoticeMapper.selectVoList(lqw).stream().map(ShipmentNoticeVo::getId).toList();
+
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqwSM = Wrappers.lambdaQuery();
+        lqwSM.in(!ids.isEmpty(), ShipmentNoticeMerchandise::getShipmentNoticeId,ids);
+        return shipmentNoticeMerchandiseMapper.selectVoList(lqwSM);
     }
 
     /**

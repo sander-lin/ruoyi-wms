@@ -93,6 +93,7 @@ public class ShipmentService {
             ShipmentNoticeMerchandise::getShipmentNoticeId, bo.getShipmentNoticeId());
 
         List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = shipmentNoticeMerchandiseMapper.selectVoList(lqw);
+        List<ShipmentMerchandiseVo> shipmentMerchandises = selectShipmentMerchandiseByShipmentNoticeId(bo.getShipmentNoticeId());
 
         bo.getMerchandises().forEach(merchandise -> {
             Inventories inventory = inventoriesMapper.selectByMerchandiseId(merchandise.getMerchandiseId());
@@ -104,10 +105,15 @@ public class ShipmentService {
             initialVo.setQuantityNotice("0");
 
             int compareQuantityNotice = Integer.parseInt(shipmentNoticeMerchandises.stream()
-                .filter(e-> e.getShipmentNoticeId().equals(merchandise.getMerchandiseId()))
+                .filter(e-> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
                 .findFirst().orElse(initialVo).getQuantityNotice());
 
-            if (merchandise.getQuantityShipped() > compareQuantityNotice) {
+            int compareQuantityShipped = shipmentMerchandises.stream()
+                .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
+                .mapToInt(e -> Integer.parseInt(e.getQuantityShipped()))
+                .sum();
+
+            if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
                 throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
             }
             if (inventory.getNumber() < merchandise.getQuantityShipped()){
@@ -126,6 +132,18 @@ public class ShipmentService {
         });
 
         checkAndSetShipmentNoticeStatus(bo);
+    }
+
+    public List<ShipmentMerchandiseVo> selectShipmentMerchandiseByShipmentNoticeId(String id) {
+
+        LambdaQueryWrapper<Shipment> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StringUtils.isNotBlank(id),Shipment::getShipmentNoticeId,id);
+
+        List<String> ids = shipmentMapper.selectVoList(lqw).stream().map(ShipmentVo::getId).toList();
+
+        LambdaQueryWrapper<ShipmentMerchandise> lqwSM = Wrappers.lambdaQuery();
+        lqwSM.in(!ids.isEmpty(), ShipmentMerchandise::getShipmentId,ids);
+        return shipmentMerchandiseMapper.selectVoList(lqwSM);
     }
 
     private void checkAndSetShipmentNoticeStatus(NewShipmentBo bo){
