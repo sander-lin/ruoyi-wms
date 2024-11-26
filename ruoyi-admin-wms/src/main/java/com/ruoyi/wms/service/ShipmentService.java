@@ -12,6 +12,7 @@ import com.ruoyi.wms.domain.bo.shipment.NewShipmentBo;
 import com.ruoyi.wms.domain.bo.shipment.ShipmentMerchandiseBo;
 import com.ruoyi.wms.domain.entity.*;
 import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
+import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.mapper.*;
@@ -23,6 +24,7 @@ import com.ruoyi.wms.domain.bo.shipment.ShipmentBo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -85,13 +87,31 @@ public class ShipmentService {
     public void insertByBo(NewShipmentBo bo) {
         Shipment add = MapstructUtils.convert(bo, Shipment.class);
         shipmentMapper.insert(add);
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
+
+        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),
+            ShipmentNoticeMerchandise::getShipmentNoticeId, bo.getShipmentNoticeId());
+
+        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = shipmentNoticeMerchandiseMapper.selectVoList(lqw);
 
         bo.getMerchandises().forEach(merchandise -> {
             Inventories inventory = inventoriesMapper.selectByMerchandiseId(merchandise.getMerchandiseId());
 
-            if (inventory == null) throw new RuntimeException("库存中不存在该商品！");
+            if (inventory == null)
+                throw new IllegalArgumentException(merchandise.getMerchandiseId() +" 库存中不存在该商品！");
+
+            ShipmentNoticeMerchandiseVo initialVo = new ShipmentNoticeMerchandiseVo();
+            initialVo.setQuantityNotice("0");
+
+            int compareQuantityNotice = Integer.parseInt(shipmentNoticeMerchandises.stream()
+                .filter(e-> e.getShipmentNoticeId().equals(merchandise.getMerchandiseId()))
+                .findFirst().orElse(initialVo).getQuantityNotice());
+
+            if (merchandise.getQuantityShipped() > compareQuantityNotice) {
+                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
+            }
             if (inventory.getNumber() < merchandise.getQuantityShipped()){
-                throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品库存不足！");
+                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品库存不足！");
             }
 
             merchandise.setShipmentId(add.getId());
@@ -116,8 +136,13 @@ public class ShipmentService {
             .mapToInt(merchandise -> Integer.parseInt(merchandise.getQuantityNotice().trim()))
             .sum();
 
-        List<ShipmentMerchandiseVo> shipmentMerchandiseVos = shipmentMerchandiseMapper.selectVoBatchIds(
-            shipmentNotice.getShipments().stream().map(ShipmentVo::getId).collect(Collectors.toList()));
+        List<Long> ids = shipmentNotice.getShipments()
+            .stream()
+            .map(shipment -> Long.parseLong(shipment.getId()))
+            .toList();
+        LambdaQueryWrapper<ShipmentMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(), ShipmentMerchandise::getShipmentId,ids);
+        List<ShipmentMerchandiseVo> shipmentMerchandiseVos = shipmentMerchandiseMapper.selectVoList(lqw);
 
         int shipmentShippedSum = shipmentMerchandiseVos.stream()
             .mapToInt(
@@ -128,10 +153,9 @@ public class ShipmentService {
         ShipmentNoticeBo shipmentNoticeBo = new ShipmentNoticeBo();
         shipmentNoticeBo.setId(shipmentNotice.getId());
 
-        if (shipmentNoticeSum > shipmentShippedSum) {
+        if (shipmentNoticeSum > shipmentShippedSum && shipmentShippedSum > 0) {
             shipmentNoticeBo.setStatus(ShipmentNoticeStatus.PART_SHIPPED.getCode());
             shipmentNoticeMapper.updateById(MapstructUtils.convert(shipmentNoticeBo,ShipmentNotice.class));
-            return;
         }
 
         shipmentNoticeBo.setStatus(ShipmentNoticeStatus.ALL_SHIPPED.getCode());
@@ -166,7 +190,6 @@ public class ShipmentService {
             this.description = description;
             this.code = code;
         }
-
     }
 
     /**

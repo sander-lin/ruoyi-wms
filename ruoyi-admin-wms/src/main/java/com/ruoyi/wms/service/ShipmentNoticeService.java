@@ -7,6 +7,7 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.wms.domain.bo.businessorder.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeMerchandiseBo;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
@@ -87,8 +88,12 @@ public class ShipmentNoticeService {
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewShipmentNoticeBo bo) {
         ShipmentNotice add = MapstructUtils.convert(bo, ShipmentNotice.class);
-
         shipmentNoticeMapper.insert(add);
+
+        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+
+        lqw.eq(StringUtils.isNotBlank(bo.getOrderId()),OrderMerchandise::getOrderId,bo.getOrderId());
+        List<OrderMerchandiseVo> orderMerchandises = orderMerchandiseMapper.selectVoList(lqw);
 
         String shipmentNoticeId = add.getId();
 
@@ -97,7 +102,18 @@ public class ShipmentNoticeService {
             merchandise.setShipmentNoticeId(shipmentNoticeId);
 
             if(!checkMerchandiseInOrder(merchandise))
-                throw new RuntimeException(merchandise.getMerchandiseId() + " 订单不存在该商品！") ;
+                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 订单不存在该商品！");
+            OrderMerchandiseVo initialVo = new OrderMerchandiseVo();
+            initialVo.setQuantityRequired("0");
+
+            int compareQuantityRequired = Integer.parseInt(orderMerchandises.stream()
+                .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
+                .findFirst()
+                .orElse(initialVo)
+                .getQuantityRequired());
+
+            if(merchandise.getQuantityNotice() > compareQuantityRequired)
+                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品通知发货数量不能超过需求数量！");
 
             shipmentNoticeMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
         });

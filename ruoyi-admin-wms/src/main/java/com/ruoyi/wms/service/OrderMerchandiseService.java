@@ -1,7 +1,7 @@
 package com.ruoyi.wms.service;
 
 import com.ruoyi.common.core.utils.MapstructUtils;
-import com.ruoyi.wms.domain.bo.businessorder.OrderMerchandiseBo;
+import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderMerchandiseBo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
@@ -22,7 +22,7 @@ public class OrderMerchandiseService {
     /**
      * 新增订单商品关系
      */
-    public void insertByBo(OrderMerchandiseBo bo) {
+    public void insertByBo(BusinessOrderMerchandiseBo bo) {
         OrderMerchandise add = MapstructUtils.convert(bo, OrderMerchandise.class);
         orderMerchandiseMapper.insert(add);
     }
@@ -30,7 +30,7 @@ public class OrderMerchandiseService {
     /**
      * 修改订单商品关系
      */
-    public void updateByBo(OrderMerchandiseBo bo) {
+    public void updateByBo(BusinessOrderMerchandiseBo bo) {
         OrderMerchandise update = MapstructUtils.convert(bo, OrderMerchandise.class);
         orderMerchandiseMapper.updateById(update);
     }
