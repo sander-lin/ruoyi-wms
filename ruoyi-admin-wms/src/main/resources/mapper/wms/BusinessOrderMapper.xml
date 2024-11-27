@@ -4,54 +4,27 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.ruoyi.wms.mapper.BusinessOrderMapper">
     <resultMap id="OrderResMap" type="com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo">
-        <id property="id" column="order_id" />
-        <result property="type" column="type" />
-        <result property="userId" column="user_id" />
-        <result property="status" column="status" />
-        <result property="remark" column="remark" />
-        <result property="totalAmount" column="total_amount" />
-        <result property="createTime" column="create_time" />
+        <id property="id" column="id" />
 
         <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo"
-                    select="selectMerchandiseList" column="order_id"/>
+                    select="selectMerchandiseList" column="id"/>
     </resultMap>
 
     <resultMap id="OrderDetailResMap" type="com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo">
-        <id property="id" column="order_id" />
-        <result property="type" column="type" />
-        <result property="status" column="status" />
-        <result property="userId" column="user_id" />
-        <result property="remark" column="remark" />
-        <result property="totalAmount" column="total_amount" />
-        <result property="createTime" column="create_time" />
+        <id property="id" column="id" />
 
         <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo"
-                    select="selectMerchandiseListByOrderId" column="order_id"/>
+                    select="selectMerchandiseListByOrderId" column="id"/>
         <collection property="shipmentNotices" ofType="com.ruoyi.wms.domain.vo.businessorder.ShipmentNoticeOrderDetailVo"
-                    select="selectShipmentNoticeByOrderId" column="order_id" />
+                    select="selectShipmentNoticeByOrderId" column="id" />
     </resultMap>
 
     <resultMap id="ShipmentNoticeResMap" type="com.ruoyi.wms.domain.vo.businessorder.ShipmentNoticeOrderDetailVo">
-        <id property="id" column="shipment_notice_id" />
-        <result property="tag" column="tag" />
-        <result property="status" column="status" />
-        <result property="deliveryMethod" column="delivery_method" />
-        <result property="createTime" column="create_time" />
+        <id property="id" column="id" />
 
         <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo"
-                    select="selectMerchandiseListByShipmentNoticeId" column="shipment_notice_id"/>
+                    select="selectMerchandiseListByShipmentNoticeId" column="id"/>
     </resultMap>
-
-
-    <sql id="selectMerchandiseSql">
-        select
-            om.quantity_required,
-            m.*,
-            m.id as m_id,
-            om.label_option
-        from order_merchandise om
-        inner join merchandise m on m.id = om.merchandise_id
-    </sql>
 
     <select id="selectMerchandiseList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderVo">
         select
@@ -61,7 +34,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.label_option
         from order_merchandise om
         inner join merchandise m on m.id = om.merchandise_id
-        where om.order_id = #{order_id}
+        where om.order_id = #{id} and om.is_delete = 0
     </select>
 
     <select id="selectMerchandiseListByOrderId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo">
@@ -83,7 +56,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         FROM (select
                 id
             from business_order
-            where id = #{order_id}
+            where id = #{id} and is_delete = 0
         ) bo
         inner join order_merchandise om on om.order_id = bo.id
         inner join merchandise m on m.id = om.merchandise_id
@@ -95,24 +68,26 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 select
                     id
                 from shipment_notice
-                where order_id = #{order_id}
+                where order_id = #{id} and is_delete = 0
             ) sn
             inner join shipment_notice_merchandise snm ON snm.shipment_notice_id = sn.id
             inner join shipment s on s.shipment_notice_id = snm.shipment_notice_id
             inner join shipment_merchandise sm ON sm.shipment_id = s.id
+            where sn.id_delete = 0
             group by sm.merchandise_id
         ) sqs on sqs.merchandise_id = m.id
         left join (
-        select
-            SUM(snm.quantity_notice) total_quantity_notice,
-            snm.merchandise_id
+            select
+                SUM(snm.quantity_notice) total_quantity_notice,
+                snm.merchandise_id
             FROM (
-            SELECT
-            id
-            FROM shipment_notice
-            WHERE order_id = #{order_id}
+                SELECT
+                    id
+                FROM shipment_notice
+                WHERE order_id = #{id} and is_delete = 0
             ) sn
             inner JOIN shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+            where sn.id_delete = 0
             GROUP BY snm.merchandise_id
         ) sqn on sqn.merchandise_id = m.id
     </select>
@@ -134,32 +109,18 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             snm.quantity_notice
         from (
             select id,order_id
-        from shipment_notice
-            where id = #{shipment_notice_id}
+            from shipment_notice
+            where id = #{id} and is_delete = 0
         ) sn
         inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
         inner join order_merchandise om on om.order_id = sn.order_id AND om.merchandise_id = snm.merchandise_id
         inner join merchandise m on m.id = snm.merchandise_id
-
     </select>
 
     <select id="selectOrderList" resultMap="OrderResMap">
         select o.*, o.id as order_id
         from business_order o
-        <where>
-            <if test="bo.id != null and bo.id != ''">
-                and o.id = #{bo.id}
-            </if>
-            <if test="bo.userId != null and bo.userId !='' ">
-                and o.user_id = #{bo.userId}
-            </if>
-            <if test="bo.type != null and bo.type != ''">
-                and o.type = #{bo.type}
-            </if>
-            <if test="bo.status != null and bo.status != ''">
-                and o.status = #{bo.status}
-            </if>
-        </where>
+        ${ew.getCustomSqlSegment}
     </select>
 
     <select id="selectOrderDetailById" resultMap="OrderDetailResMap" parameterType="Long">
@@ -167,7 +128,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             *,
             id order_id
         from business_order
-        where id = #{id}
+        where id = #{id} and is_delete = 0
     </select>
 
     <select id="selectShipmentNoticeByOrderId" resultMap="ShipmentNoticeResMap">
@@ -175,7 +136,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             *,
             id shipment_notice_id
         from shipment_notice
-        where order_id = #{order_id}
+        where order_id = #{id} and is_delete = 0
     </select>
 
 </mapper>

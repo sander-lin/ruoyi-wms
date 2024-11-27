@@ -17,7 +17,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 shipment_notice_id,
                 quantity_notice
             from shipment_notice_merchandise
-            where shipment_notice_id = #{id}
+            where shipment_notice_id = #{id} and is_delete = 0
         ) snm
         inner join shipment_notice sn on sn.id = snm.shipment_notice_id
         inner join order_merchandise om on om.merchandise_id = snm.merchandise_id and om.order_id = sn.order_id
@@ -33,7 +33,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                     id,
                     order_id
                 from shipment_notice
-                where id = #{id}
+                where id = #{id} and is_delete = 0
             ) sn2
             inner join shipment s2 on s2.shipment_notice_id = sn2.id
             inner join shipment_merchandise sm2 on sm2.shipment_id = s2.id
@@ -55,7 +55,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 quantity_required,
                 label_option
             from order_merchandise
-            where order_id = #{id}
+            where order_id = #{id} and is_delete = 0
         ) om
         inner join merchandise m on m.id = om.merchandise_id
         left join (
@@ -66,7 +66,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
                 select
                     id
                 from shipment_notice
-                where order_id = #{id}
+                where order_id = #{id} and is_delete = 0
             ) sn2
             inner join shipment_notice_merchandise snm2 on snm2.shipment_notice_id = sn2.id
             group by merchandise_id

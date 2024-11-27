@@ -11,13 +11,11 @@ import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipment.NewShipmentBo;
 import com.ruoyi.wms.domain.bo.shipment.ShipmentMerchandiseBo;
 import com.ruoyi.wms.domain.entity.*;
-import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
 import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.mapper.*;
-import lombok.Data;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,7 +27,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 /**
  * 发货管理Service业务层处理
@@ -96,44 +93,59 @@ public class ShipmentService {
         List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = shipmentNoticeMerchandiseMapper.selectVoList(lqw);
         List<ShipmentMerchandiseVo> shipmentMerchandises = selectShipmentMerchandiseByShipmentNoticeId(bo.getShipmentNoticeId());
 
-        bo.getMerchandises().forEach(merchandise -> {
-            ShipmentNoticeMerchandiseVo initialVo = new ShipmentNoticeMerchandiseVo();
-            initialVo.setQuantityNotice("0");
+        for (ShipmentMerchandiseBo merchandise : bo.getMerchandises()) {
 
-            int compareQuantityNotice = Integer.parseInt(shipmentNoticeMerchandises.stream()
-                .filter(e-> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
-                .findFirst().orElse(initialVo).getQuantityNotice());
-
-            int compareQuantityShipped = shipmentMerchandises.stream()
-                .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
-                .mapToInt(e -> Integer.parseInt(e.getQuantityShipped()))
-                .sum();
-
-            if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
-                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
-            }
+            checkQuantityShipped(merchandise, shipmentNoticeMerchandises, shipmentMerchandises);
 
             Inventories inventory = inventoriesMapper.selectByMerchandiseId(merchandise.getMerchandiseId());
 
-            if (inventory == null)
-                throw new IllegalArgumentException(merchandise.getMerchandiseId() +" 库存中不存在该商品！");
+            checkInventory(merchandise, inventory);
 
-            if (inventory.getNumber() < merchandise.getQuantityShipped()){
-                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品库存不足！");
-            }
-
+            assert add != null;
             merchandise.setShipmentId(add.getId());
             merchandise.setShipmentNoticeId(bo.getShipmentNoticeId());
-            if(!checkMerchandiseInShipmentNotice(merchandise))
+
+            if (!checkMerchandiseInShipmentNotice(merchandise))
                 throw new RuntimeException(merchandise.getMerchandiseId() + " 通知单不存在该商品！");
 
             shipmentMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentMerchandise.class));
 
             inventory.setNumber(inventory.getNumber() - merchandise.getQuantityShipped());
             inventoriesMapper.updateInventoryById(inventory);
-        });
+        }
 
         checkAndSetShipmentNoticeStatus(bo);
+    }
+
+    private void checkInventory(ShipmentMerchandiseBo merchandise, Inventories inventory) {
+        if (inventory == null)
+            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 库存中不存在该商品！");
+
+        if (inventory.getNumber() < merchandise.getQuantityShipped()) {
+            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品库存不足！");
+        }
+    }
+
+    private void checkQuantityShipped(
+        ShipmentMerchandiseBo merchandise,
+        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises,
+        List<ShipmentMerchandiseVo> shipmentMerchandises
+    ) {
+        ShipmentNoticeMerchandiseVo initialVo = new ShipmentNoticeMerchandiseVo();
+        initialVo.setQuantityNotice("0");
+
+        int compareQuantityNotice = Integer.parseInt(shipmentNoticeMerchandises.stream()
+            .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
+            .findFirst().orElse(initialVo).getQuantityNotice());
+
+        int compareQuantityShipped = shipmentMerchandises.stream()
+            .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
+            .mapToInt(e -> Integer.parseInt(e.getQuantityShipped()))
+            .sum();
+
+        if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
+            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
+        }
     }
 
     public List<ShipmentMerchandiseVo> selectShipmentMerchandiseByShipmentNoticeId(String id) {
@@ -160,9 +172,8 @@ public class ShipmentService {
             .stream()
             .map(shipment -> Long.parseLong(shipment.getId()))
             .toList();
-        LambdaQueryWrapper<ShipmentMerchandise> lqw = Wrappers.lambdaQuery();
-        lqw.in(!ids.isEmpty(), ShipmentMerchandise::getShipmentId,ids);
-        List<ShipmentMerchandiseVo> shipmentMerchandiseVos = shipmentMerchandiseMapper.selectVoList(lqw);
+
+        List<ShipmentMerchandiseVo> shipmentMerchandiseVos = getShipmentMerchandiseVos(ids);
 
         int shipmentShippedSum = shipmentMerchandiseVos.stream()
             .mapToInt(
@@ -182,12 +193,20 @@ public class ShipmentService {
         shipmentNoticeMapper.updateById(MapstructUtils.convert(shipmentNoticeBo,ShipmentNotice.class));
     }
 
+    private List<ShipmentMerchandiseVo> getShipmentMerchandiseVos(List<Long> ids) {
+        LambdaQueryWrapper<ShipmentMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(), ShipmentMerchandise::getShipmentId, ids);
+        lqw.eq(ShipmentMerchandise::getIsDelete,false);
+        return shipmentMerchandiseMapper.selectVoList(lqw);
+    }
+
     private Boolean checkMerchandiseInShipmentNotice(ShipmentMerchandiseBo bo) {
         LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),
             ShipmentNoticeMerchandise::getMerchandiseId,bo.getMerchandiseId());
         lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),
             ShipmentNoticeMerchandise::getShipmentNoticeId,bo.getShipmentNoticeId());
+        lqw.eq(ShipmentNoticeMerchandise::getIsDelete,false);
         long count = shipmentNoticeMerchandiseMapper.selectCount(lqw);
         return count > 0;
     }

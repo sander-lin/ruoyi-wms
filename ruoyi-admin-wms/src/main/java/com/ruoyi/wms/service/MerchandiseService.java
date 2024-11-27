@@ -7,15 +7,24 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.wms.domain.entity.OrderMerchandise;
+import com.ruoyi.wms.domain.entity.ShipmentMerchandise;
+import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
+import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo;
+import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
+import com.ruoyi.wms.mapper.ShipmentMerchandiseMapper;
+import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.MerchandiseBo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.mapper.MerchandiseMapper;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -31,6 +40,7 @@ import java.util.Collection;
 public class MerchandiseService {
 
     private final MerchandiseMapper merchandiseMapper;
+    private final OrderMerchandiseMapper orderMerchandiseMapper;
 
     /**
      * 查询商品管理
@@ -86,6 +96,7 @@ public class MerchandiseService {
         lqw.eq(StringUtils.isNotBlank(bo.getImage()), Merchandise::getImage, bo.getImage());
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), Merchandise::getUserId, bo.getUserId());
         lqw.eq(bo.getPrice() != null, Merchandise::getPrice, bo.getPrice());
+        lqw.eq(Merchandise::getIsDelete,false);
         return lqw;
     }
 
@@ -109,6 +120,21 @@ public class MerchandiseService {
      * 批量删除商品管理
      */
     public void deleteByIds(Collection<String> ids) {
-        merchandiseMapper.deleteBatchIds(ids);
+        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(), OrderMerchandise::getMerchandiseId,ids);
+
+        List<OrderMerchandiseVo> orderMerchandiseVos = orderMerchandiseMapper.selectVoList(lqw);
+
+        if(!orderMerchandiseVos.isEmpty()) throw new IllegalArgumentException("订单中存在将删除的商品！");
+
+        List<Merchandise> merchandises = new ArrayList<>();
+        ids.forEach(id -> {
+            Merchandise merchandise = new Merchandise();
+            merchandise.setId(id);
+            merchandise.setIsDelete(true);
+            merchandises.add(merchandise);
+        });
+        merchandiseMapper.updateBatchById(merchandises);
+
     }
 }

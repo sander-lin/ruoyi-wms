@@ -65,8 +65,9 @@ public class BusinessOrderService {
         return TableDataInfo.build(result);
     }
 
-    public TableDataInfo<BusinessOrderVo> OrderList(BusinessOrderBo bo, PageQuery pageQuery) {
-        Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), bo);
+    public TableDataInfo<BusinessOrderVo> queryOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
+        Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 
@@ -84,6 +85,7 @@ public class BusinessOrderService {
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), BusinessOrder::getUserId, bo.getUserId());
         lqw.eq(StringUtils.isNotBlank(bo.getType()), BusinessOrder::getType, bo.getType());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BusinessOrder::getStatus, bo.getStatus());
+        lqw.eq(BusinessOrder::getIsDelete,false);
         return lqw;
     }
 
