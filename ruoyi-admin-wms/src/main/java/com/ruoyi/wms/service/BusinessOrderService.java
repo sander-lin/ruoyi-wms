@@ -86,6 +86,7 @@ public class BusinessOrderService {
         lqw.eq(StringUtils.isNotBlank(bo.getType()), BusinessOrder::getType, bo.getType());
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BusinessOrder::getStatus, bo.getStatus());
         lqw.eq(BusinessOrder::getIsDelete,false);
+        lqw.orderByDesc(BusinessOrder::getUpdateTime);
         return lqw;
     }
 

@@ -65,7 +65,7 @@ public class ShipmentController extends BaseController {
      */
     @SaCheckPermission("wms:shipment:query")
     @GetMapping("/{id}")
-    public R<ShipmentDetailVo> getInfo(@NotNull(message = "id不能为空")
+    public R<ShipmentDetailVo> getInfoById(@NotNull(message = "id不能为空")
                                      @PathVariable String id) {
         return R.ok(shipmentService.queryById(id));
     }

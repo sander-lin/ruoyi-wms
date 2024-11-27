@@ -75,6 +75,8 @@ public class ShipmentService {
         lqw.eq(StringUtils.isNotBlank(bo.getStatus()), Shipment::getStatus, bo.getStatus());
         lqw.eq(StringUtils.isNotBlank(bo.getDeliveryMethod()), Shipment::getDeliveryMethod, bo.getDeliveryMethod());
         lqw.eq(StringUtils.isNotBlank(bo.getLogisticsNumber()), Shipment::getLogisticsNumber, bo.getLogisticsNumber());
+        lqw.eq(Shipment::getIsDelete,false);
+        lqw.orderByDesc(Shipment::getUpdateTime);
         return lqw;
     }
 

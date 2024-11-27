@@ -31,7 +31,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             snm.quantity_notice
         from shipment_notice_merchandise snm
         inner join merchandise m on m.id = snm.merchandise_id
-        where snm.shipment_notice_id = #{id} and is_delete = 0
+        where snm.shipment_notice_id = #{id} and snm.is_delete = 0
     </select>
 
     <select id="selectShipmentNoticeById" resultMap="ShipmentNoticeDetailResMap">
