@@ -225,18 +225,36 @@ public class ShipmentService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
-        shipmentMapper.deleteBatchIds(ids);
+        List<ShipmentMerchandiseVo> shipmentMerchandiseVos = getShipmentMerchandiseVos(ids);
+        List<Shipment> shipments = new ArrayList<>();
+        ids.forEach(id -> {
+            List<ShipmentMerchandise> shipmentMerchandises = shipmentMerchandiseVos.stream()
+                .filter(e -> e.getShipmentId().equals(id))
+                .map(e-> {
+                    ShipmentMerchandise res = new ShipmentMerchandise();
+                    res.setId(e.getId());
+                    res.setIsDelete(true);
+                    return res;
+                })
+                .toList();
+
+            if(!shipmentMerchandises.isEmpty()) {
+                shipmentMerchandiseMapper.updateBatchById(shipmentMerchandises);
+            }
+
+            Shipment shipment = new Shipment();
+            shipment.setIsDelete(true);
+            shipment.setId(id);
+            shipments.add(shipment);
+        });
+
+        shipmentMapper.updateBatchById(shipments);
+
+    }
+
+    private List<ShipmentMerchandiseVo> getShipmentMerchandiseVos(Collection<String> ids) {
         LambdaQueryWrapper<ShipmentMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.in(!ids.isEmpty(),ShipmentMerchandise::getShipmentId, ids);
-        List<ShipmentMerchandiseVo> shipmentMerchandises = shipmentMerchandiseMapper.selectVoList(lqw);
-        ids.forEach(id -> {
-            List<String> smIds = shipmentMerchandises.stream()
-                .filter(e -> e.getShipmentId().equals(id))
-                .map(ShipmentMerchandiseVo::getId)
-                .toList();
-            if(!smIds.isEmpty()) {
-                shipmentMerchandiseMapper.deleteBatchIds(smIds);
-            }
-        });
+        return shipmentMerchandiseMapper.selectVoList(lqw);
     }
 }

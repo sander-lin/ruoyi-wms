@@ -46,6 +46,11 @@ public class BusinessOrder extends BaseEntity {
     private String remark;
 
     /**
+     * 是否删除
+     */
+    private Boolean isDelete;
+
+    /**
      * 订单总额
      */
     private BigDecimal totalAmount;

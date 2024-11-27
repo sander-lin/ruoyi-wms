@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.wms.mapper.BusinessOrderMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -113,11 +114,9 @@ public class BusinessOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
-        businessOrderMapper.deleteBatchIds(ids);
-        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+        List<OrderMerchandiseVo> orderMerchandises = getOrderMerchandiseVos(ids);
+        List<BusinessOrder> businessOrders = new ArrayList<>();
 
-        lqw.in(!ids.isEmpty(),OrderMerchandise::getOrderId, ids);
-        List<OrderMerchandiseVo> orderMerchandises = orderMerchandiseMapper.selectVoList(lqw);
         ids.forEach(id -> {
             List<String> omIds = orderMerchandises.stream()
                 .filter(e -> e.getOrderId().equals(id))
@@ -126,11 +125,25 @@ public class BusinessOrderService {
             if(!omIds.isEmpty()) {
                 orderMerchandiseService.deleteByIds(omIds);
             }
+
+            BusinessOrder businessOrder = new BusinessOrder();
+            businessOrder.setIsDelete(true);
+            businessOrder.setId(id);
+            businessOrders.add(businessOrder);
         });
+
         List<String> shipmentNoticeIds = getShipmentNoticeIdByOrderIds(ids);
         if(!shipmentNoticeIds.isEmpty()) {
             shipmentNoticeService.deleteByIds(shipmentNoticeIds);
         }
+
+        businessOrderMapper.updateBatchById(businessOrders);
+    }
+
+    private List<OrderMerchandiseVo> getOrderMerchandiseVos(Collection<String> ids) {
+        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(),OrderMerchandise::getOrderId, ids);
+        return orderMerchandiseMapper.selectVoList(lqw);
     }
 
     private List<String> getShipmentNoticeIdByOrderIds(Collection<String> ids){

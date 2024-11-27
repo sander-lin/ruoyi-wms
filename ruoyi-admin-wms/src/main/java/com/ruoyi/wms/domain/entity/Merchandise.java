@@ -24,7 +24,7 @@ public class Merchandise extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     /**
-     * 
+     *
      */
     @TableId(value = "id")
     private String id;
@@ -64,5 +64,8 @@ public class Merchandise extends BaseEntity {
      * 单价
      */
     private BigDecimal price;
-
+    /**
+     * 是否删除
+     */
+    private Boolean isDelete;
 }

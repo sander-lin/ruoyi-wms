@@ -32,6 +32,11 @@ public class Inventories implements Serializable {
      */
     private Integer number;
     /**
+     * 是否删除
+     */
+    private Boolean isDelete;
+
+    /**
      * 商品id
      */
     private String merchandiseId;

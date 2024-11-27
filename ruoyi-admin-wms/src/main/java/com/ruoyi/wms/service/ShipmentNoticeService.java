@@ -25,6 +25,7 @@ import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -159,24 +160,43 @@ public class ShipmentNoticeService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
-
-        shipmentNoticeMapper.deleteBatchIds(ids);
-        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
-        lqw.in(!ids.isEmpty(),ShipmentNoticeMerchandise::getShipmentNoticeId, ids);
-        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = shipmentNoticeMerchandiseMapper.selectVoList(lqw);
-        ids.forEach(id -> {
-            List<String> snmIds = shipmentNoticeMerchandises.stream()
-                .filter(e -> e.getShipmentNoticeId().equals(id))
-                .map(ShipmentNoticeMerchandiseVo::getId)
-                .toList();
-            if(!snmIds.isEmpty()) {
-                shipmentNoticeMerchandiseMapper.deleteBatchIds(snmIds);
-            }
-        });
         List<String> shipmentIds = getShipmentIdByNoticeIds(ids);
+
         if(!shipmentIds.isEmpty()) {
             shipmentService.deleteByIds(shipmentIds);
         }
+
+        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandiseVos = getShipmentNoticeMerchandiseVos(ids);
+        List<ShipmentNotice> shipmentNotices = new ArrayList<>();
+
+        ids.forEach(id -> {
+            List<ShipmentNoticeMerchandise> shipmentNoticeMerchandises = shipmentNoticeMerchandiseVos.stream()
+                .filter(e -> e.getShipmentNoticeId().equals(id))
+                .map(e -> {
+                    ShipmentNoticeMerchandise res = new ShipmentNoticeMerchandise();
+                    res.setId(e.getId());
+                    res.setIsDelete(true);
+                    return res;
+                })
+                .toList();
+
+            if(!shipmentNoticeMerchandises.isEmpty()) {
+                shipmentNoticeMerchandiseMapper.updateBatchById(shipmentNoticeMerchandises);
+            }
+
+            ShipmentNotice shipmentNotice = new ShipmentNotice();
+            shipmentNotice.setIsDelete(true);
+            shipmentNotice.setId(id);
+            shipmentNotices.add(shipmentNotice);
+        });
+
+        shipmentNoticeMapper.updateBatchById(shipmentNotices);
+    }
+
+    private List<ShipmentNoticeMerchandiseVo> getShipmentNoticeMerchandiseVos(Collection<String> ids) {
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(),ShipmentNoticeMerchandise::getShipmentNoticeId, ids);
+        return shipmentNoticeMerchandiseMapper.selectVoList(lqw);
     }
 
     private List<String> getShipmentIdByNoticeIds(Collection<String> ids){

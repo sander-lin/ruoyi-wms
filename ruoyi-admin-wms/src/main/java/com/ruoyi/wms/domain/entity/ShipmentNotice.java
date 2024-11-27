@@ -23,16 +23,16 @@ public class ShipmentNotice extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     /**
-     * 
+     *
      */
     @TableId(value = "id")
     private String id;
     /**
-     * 
+     *
      */
     private String orderId;
     /**
-     * 
+     *
      */
     private String userId;
     /**
@@ -47,6 +47,10 @@ public class ShipmentNotice extends BaseEntity {
      * 配送方式（物流渠道）
      */
     private String deliveryMethod;
+    /**
+     * 是否删除
+     */
+    private Boolean isDelete;
     /**
      * 备注
      */

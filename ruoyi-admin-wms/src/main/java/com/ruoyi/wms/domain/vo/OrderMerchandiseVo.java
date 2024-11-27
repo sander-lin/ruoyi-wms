@@ -21,7 +21,7 @@ import java.io.Serializable;
 
 @Data
 @EqualsAndHashCode(callSuper=false)
-@AutoMapper(target = OrderMerchandise.class, reverseConvertGenerate = false)
+@AutoMapper(target = OrderMerchandise.class)
 public class OrderMerchandiseVo implements Serializable {
 
     @Serial
