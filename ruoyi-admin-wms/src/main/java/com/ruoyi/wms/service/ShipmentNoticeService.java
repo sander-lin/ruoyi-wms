@@ -16,6 +16,7 @@ import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
+import com.ruoyi.wms.mapper.ShipmentMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,8 @@ public class ShipmentNoticeService {
     private final ShipmentNoticeMapper shipmentNoticeMapper;
     private final ShipmentNoticeMerchandiseMapper shipmentNoticeMerchandiseMapper;
     private final OrderMerchandiseMapper orderMerchandiseMapper;
+    private final ShipmentService shipmentService;
+    private final ShipmentMapper shipmentMapper;
 
     /**
      * 查询发货请求通知单
@@ -154,7 +157,31 @@ public class ShipmentNoticeService {
     /**
      * 批量删除发货请求通知单
      */
+    @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
+
         shipmentNoticeMapper.deleteBatchIds(ids);
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(),ShipmentNoticeMerchandise::getShipmentNoticeId, ids);
+        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = shipmentNoticeMerchandiseMapper.selectVoList(lqw);
+        ids.forEach(id -> {
+            List<String> snmIds = shipmentNoticeMerchandises.stream()
+                .filter(e -> e.getShipmentNoticeId().equals(id))
+                .map(ShipmentNoticeMerchandiseVo::getId)
+                .toList();
+            if(!snmIds.isEmpty()) {
+                shipmentNoticeMerchandiseMapper.deleteBatchIds(snmIds);
+            }
+        });
+        List<String> shipmentIds = getShipmentIdByNoticeIds(ids);
+        if(!shipmentIds.isEmpty()) {
+            shipmentService.deleteByIds(shipmentIds);
+        }
+    }
+
+    private List<String> getShipmentIdByNoticeIds(Collection<String> ids){
+        LambdaQueryWrapper<Shipment> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(),Shipment::getShipmentNoticeId, ids);
+        return shipmentMapper.selectVoList(lqw).stream().map(ShipmentVo::getId).toList();
     }
 }

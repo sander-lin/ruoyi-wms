@@ -11,6 +11,7 @@ import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
 import com.ruoyi.wms.domain.bo.shipment.NewShipmentBo;
 import com.ruoyi.wms.domain.bo.shipment.ShipmentMerchandiseBo;
 import com.ruoyi.wms.domain.entity.*;
+import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
 import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
@@ -96,11 +97,6 @@ public class ShipmentService {
         List<ShipmentMerchandiseVo> shipmentMerchandises = selectShipmentMerchandiseByShipmentNoticeId(bo.getShipmentNoticeId());
 
         bo.getMerchandises().forEach(merchandise -> {
-            Inventories inventory = inventoriesMapper.selectByMerchandiseId(merchandise.getMerchandiseId());
-
-            if (inventory == null)
-                throw new IllegalArgumentException(merchandise.getMerchandiseId() +" 库存中不存在该商品！");
-
             ShipmentNoticeMerchandiseVo initialVo = new ShipmentNoticeMerchandiseVo();
             initialVo.setQuantityNotice("0");
 
@@ -116,6 +112,12 @@ public class ShipmentService {
             if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
                 throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
             }
+
+            Inventories inventory = inventoriesMapper.selectByMerchandiseId(merchandise.getMerchandiseId());
+
+            if (inventory == null)
+                throw new IllegalArgumentException(merchandise.getMerchandiseId() +" 库存中不存在该商品！");
+
             if (inventory.getNumber() < merchandise.getQuantityShipped()){
                 throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品库存不足！");
             }
@@ -221,7 +223,20 @@ public class ShipmentService {
     /**
      * 批量删除发货管理
      */
+    @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
         shipmentMapper.deleteBatchIds(ids);
+        LambdaQueryWrapper<ShipmentMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(),ShipmentMerchandise::getShipmentId, ids);
+        List<ShipmentMerchandiseVo> shipmentMerchandises = shipmentMerchandiseMapper.selectVoList(lqw);
+        ids.forEach(id -> {
+            List<String> smIds = shipmentMerchandises.stream()
+                .filter(e -> e.getShipmentId().equals(id))
+                .map(ShipmentMerchandiseVo::getId)
+                .toList();
+            if(!smIds.isEmpty()) {
+                shipmentMerchandiseMapper.deleteBatchIds(smIds);
+            }
+        });
     }
 }

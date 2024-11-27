@@ -7,6 +7,8 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 
+import java.util.Collection;
+
 /**
  * 订单商品关系Service业务层处理
  *
@@ -35,4 +37,10 @@ public class OrderMerchandiseService {
         orderMerchandiseMapper.updateById(update);
     }
 
+    /**
+     * 批量删除订单商品关系
+     */
+    public void deleteByIds(Collection<String> ids) {
+        orderMerchandiseMapper.deleteBatchIds(ids);
+    }
 }

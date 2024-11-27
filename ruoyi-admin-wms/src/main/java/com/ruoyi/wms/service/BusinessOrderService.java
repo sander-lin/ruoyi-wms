@@ -10,8 +10,15 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.entity.BusinessOrder;
+import com.ruoyi.wms.domain.entity.OrderMerchandise;
+import com.ruoyi.wms.domain.entity.Shipment;
+import com.ruoyi.wms.domain.entity.ShipmentNotice;
+import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
+import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
+import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
+import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.mapper.BusinessOrderMapper;
@@ -33,6 +40,9 @@ public class BusinessOrderService {
 
     private final BusinessOrderMapper businessOrderMapper;
     private final OrderMerchandiseService orderMerchandiseService;
+    private final OrderMerchandiseMapper orderMerchandiseMapper;
+    private final ShipmentNoticeMapper shipmentNoticeMapper;
+    private final ShipmentNoticeService shipmentNoticeService;
 
     /**
      * 查询订单表
@@ -101,7 +111,31 @@ public class BusinessOrderService {
     /**
      * 批量删除订单表
      */
+    @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
         businessOrderMapper.deleteBatchIds(ids);
+        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+
+        lqw.in(!ids.isEmpty(),OrderMerchandise::getOrderId, ids);
+        List<OrderMerchandiseVo> orderMerchandises = orderMerchandiseMapper.selectVoList(lqw);
+        ids.forEach(id -> {
+            List<String> omIds = orderMerchandises.stream()
+                .filter(e -> e.getOrderId().equals(id))
+                .map(OrderMerchandiseVo::getId)
+                .toList();
+            if(!omIds.isEmpty()) {
+                orderMerchandiseService.deleteByIds(omIds);
+            }
+        });
+        List<String> shipmentNoticeIds = getShipmentNoticeIdByOrderIds(ids);
+        if(!shipmentNoticeIds.isEmpty()) {
+            shipmentNoticeService.deleteByIds(shipmentNoticeIds);
+        }
+    }
+
+    private List<String> getShipmentNoticeIdByOrderIds(Collection<String> ids){
+        LambdaQueryWrapper<ShipmentNotice> lqw = Wrappers.lambdaQuery();
+        lqw.in(!ids.isEmpty(),ShipmentNotice::getOrderId, ids);
+        return shipmentNoticeMapper.selectVoList(lqw).stream().map(ShipmentNoticeVo::getId).toList();
     }
 }
