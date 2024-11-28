@@ -19,14 +19,20 @@ import java.io.Serial;
 @ExcelIgnoreUnannotated
 @EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = Merchandise.class)
-public class MerchandiseOrderVo extends MerchandiseVo {
+public class MerchandiseShipmentVo extends MerchandiseVo {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 订单需求数量
+     * 选项
      */
-    @ExcelProperty(value = "订单需求数量")
-    private String quantityRequired;
+    @ExcelProperty(value = "选项")
+    private String labelOption;
+
+    /**
+     * 发货数量
+     */
+    @ExcelProperty(value = "发货数量")
+    private String quantityShipped;
 }

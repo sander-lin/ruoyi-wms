@@ -3,7 +3,6 @@
  import com.ruoyi.wms.domain.entity.OrderMerchandise;
  import com.ruoyi.common.core.validate.AddGroup;
  import com.ruoyi.common.core.validate.EditGroup;
- import com.ruoyi.common.mybatis.core.domain.BaseEntity;
  import lombok.Data;
  import lombok.EqualsAndHashCode;
  import jakarta.validation.constraints.*;
@@ -23,7 +22,7 @@
  @Data
  @EqualsAndHashCode(callSuper=false)
  @AutoMapper(target = OrderMerchandise.class, reverseConvertGenerate = false)
- public class OrderMerchandiseBo implements Serializable {
+ public class BusinessOrderMerchandiseBo implements Serializable {
 
      @Serial
      private static final long serialVersionUID = 1L;

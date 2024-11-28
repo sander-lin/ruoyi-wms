@@ -1,12 +1,12 @@
-package com.ruoyi.wms.domain.vo;
+package com.ruoyi.wms.domain.vo.shipment;
 
+import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.entity.Shipment;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.io.Serial;
@@ -20,13 +20,14 @@ import java.io.Serial;
 @Data
 @ExcelIgnoreUnannotated
 @AutoMapper(target = Shipment.class)
-public class ShipmentVo implements Serializable {
+@EqualsAndHashCode(callSuper = true)
+public class ShipmentVo extends BaseVo {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String id;

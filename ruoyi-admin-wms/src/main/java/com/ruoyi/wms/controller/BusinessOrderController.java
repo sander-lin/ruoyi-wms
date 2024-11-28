@@ -45,7 +45,7 @@ public class BusinessOrderController extends BaseController {
     @SaCheckPermission("wms:order:list")
     @GetMapping("/list")
     public TableDataInfo<BusinessOrderVo> lists(BusinessOrderBo bo, PageQuery pageQuery) {
-        return orderService.OrderList(bo, pageQuery);
+        return orderService.queryOrderList(bo, pageQuery);
     }
 
     /**

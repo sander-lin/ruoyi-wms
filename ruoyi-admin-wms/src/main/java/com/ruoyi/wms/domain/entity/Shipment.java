@@ -23,7 +23,7 @@ public class Shipment extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     /**
-     * 
+     *
      */
     @TableId(value = "id")
     private String id;
@@ -43,6 +43,12 @@ public class Shipment extends BaseEntity {
      * 备注
      */
     private String remark;
+
+    /**
+     * 是否删除
+     */
+    private Boolean isDelete;
+
     /**
      * 物流单号
      */

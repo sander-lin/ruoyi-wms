@@ -37,6 +37,10 @@ public class ShipmentMerchandise implements Serializable {
      */
     private String shipmentId;
     /**
+     * 是否删除
+     */
+    private Boolean isDelete;
+    /**
      * 已发数量
      */
     private String quantityShipped;

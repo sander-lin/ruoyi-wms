@@ -2,6 +2,8 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -43,6 +45,24 @@ public class MerchandiseController extends BaseController {
     @GetMapping("/list")
     public TableDataInfo<MerchandiseVo> list(MerchandiseBo bo, PageQuery pageQuery) {
         return merchandiseService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 通过订单ID查询商品
+     */
+    @SaCheckPermission("wms:merchandise:list")
+    @GetMapping("/order/{id}")
+    public TableDataInfo<MerchandiseNoticeCreatingVo> queryByOrderId(@PathVariable long id, PageQuery pageQuery) {
+        return merchandiseService.queryByOrderId(id, pageQuery);
+    }
+
+    /**
+     * 通过通知单ID查询商品
+     */
+    @SaCheckPermission("wms:merchandise:list")
+    @GetMapping("/shipmentNotice/{id}")
+    public TableDataInfo<MerchandiseShipmentCreatingVo> queryByShipmentNoticeId(@PathVariable long id, PageQuery pageQuery) {
+        return merchandiseService.queryByShipmentNoticeId(id, pageQuery);
     }
 
     /**

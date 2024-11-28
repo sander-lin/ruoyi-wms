@@ -23,7 +23,7 @@ public class Financial extends BaseEntity {
     private static final long serialVersionUID=1L;
 
     /**
-     * 
+     *
      */
     @TableId(value = "id")
     private String id;
@@ -35,6 +35,12 @@ public class Financial extends BaseEntity {
      * 支出，收入状态
      */
     private String state;
+
+    /**
+     * 是否删除
+     */
+    private Boolean isDelete;
+
     /**
      * 金额
      */

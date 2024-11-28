@@ -37,28 +37,16 @@ public class OrderMerchandise implements Serializable {
      */
     private String merchandiseId;
     /**
-     * 发货通知单id
-     */
-    private String shipmentNoticeId;
-    /**
-     * 发货单id
-     */
-    private String shipmentId;
-    /**
      * 选项
      */
     private String labelOption;
     /**
+     * 是否删除
+     */
+    private Boolean isDelete;
+    /**
      * 需求数量
      */
     private String quantityRequired;
-    /**
-     * 通知数量
-     */
-    private String quantityNotice;
-    /**
-     * 已发数量
-     */
-    private String quantityShipped;
 
 }

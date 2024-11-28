@@ -1,8 +1,8 @@
- package com.ruoyi.wms.domain.bo.shipmentnotice;
+ package com.ruoyi.wms.domain.bo.shipment;
 
  import com.ruoyi.common.core.validate.AddGroup;
  import com.ruoyi.common.core.validate.EditGroup;
- import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
+ import com.ruoyi.wms.domain.entity.ShipmentMerchandise;
  import io.github.linpeilie.annotations.AutoMapper;
  import jakarta.validation.constraints.NotBlank;
  import lombok.Data;
@@ -21,16 +21,16 @@
 
  @Data
  @EqualsAndHashCode(callSuper=false)
- @AutoMapper(target = ShipmentNoticeMerchandise.class, reverseConvertGenerate = false)
- public class ShipmentNoticeMerchandiseBo implements Serializable {
+ @AutoMapper(target = ShipmentMerchandise.class, reverseConvertGenerate = false)
+ public class ShipmentMerchandiseBo implements Serializable {
 
      @Serial
      private static final long serialVersionUID = 1L;
 
      /**
-      * 订单id
+      * 发货通知单id
       */
-     private String orderId;
+     private String shipmentNoticeId;
 
      /**
       * 商品id
@@ -39,15 +39,14 @@
      private String merchandiseId;
 
      /**
-      * 请求通知单id
+      * 发货单id
       */
-     private String shipmentNoticeId;
+     private String shipmentId;
 
      /**
       * 需求数量
       */
      @NotBlank(message = "请求通知数量不能为空", groups = { AddGroup.class, EditGroup.class })
-     private int quantityNotice;
-
+     private int quantityShipped;
  }
 

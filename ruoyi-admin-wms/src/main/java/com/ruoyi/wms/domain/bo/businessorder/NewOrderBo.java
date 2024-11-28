@@ -55,5 +55,5 @@
      @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
      private String totalAmount;
 
-     private List<OrderMerchandiseBo> merchandises;
+     private List<BusinessOrderMerchandiseBo> merchandises;
  }
