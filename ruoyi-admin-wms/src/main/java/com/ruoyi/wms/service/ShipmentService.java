@@ -189,6 +189,7 @@ public class ShipmentService {
         if (shipmentNoticeSum > shipmentShippedSum && shipmentShippedSum > 0) {
             shipmentNoticeBo.setStatus(ShipmentNoticeStatus.PART_SHIPPED.getCode());
             shipmentNoticeMapper.updateById(MapstructUtils.convert(shipmentNoticeBo,ShipmentNotice.class));
+            return;
         }
 
         shipmentNoticeBo.setStatus(ShipmentNoticeStatus.ALL_SHIPPED.getCode());
