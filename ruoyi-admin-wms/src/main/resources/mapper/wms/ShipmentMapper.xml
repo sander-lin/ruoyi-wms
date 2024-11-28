@@ -38,8 +38,10 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
 
     <select id="selectShipmentById" resultMap="ShipmentResMap">
         select
-            *
-        from shipment
-        where id = #{id} and is_delete = 0
+            s.*,
+            sn.tag
+        from shipment s
+        inner join shipment_notice sn on sn.id = s.shipment_notice_id
+        where s.id = #{id} and s.is_delete = 0
     </select>
 </mapper>
