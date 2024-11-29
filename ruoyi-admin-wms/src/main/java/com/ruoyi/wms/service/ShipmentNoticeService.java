@@ -105,7 +105,7 @@ public class ShipmentNoticeService {
             merchandise.setShipmentNoticeId(shipmentNoticeId);
 
             if(!checkMerchandiseInOrder(merchandise))
-                throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 订单不存在该商品！");
+                throw new RuntimeException(merchandise.getMerchandiseId() + " 订单不存在该商品！");
 
             checkQuantityNotice(merchandise, orderMerchandises, noticeMerchandise);
 
@@ -128,11 +128,12 @@ public class ShipmentNoticeService {
             .getQuantityRequired());
 
         int compareQuantityNoticed = noticeMerchandise.stream()
+            .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
             .mapToInt(e-> Integer.parseInt(e.getQuantityNotice()))
             .sum();
 
         if(merchandise.getQuantityNotice() > (compareQuantityRequired - compareQuantityNoticed))
-            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品通知发货数量不能超过需求数量！");
+            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品通知发货数量不能超过需求数量！");
     }
 
     private List<OrderMerchandiseVo> getOrderMerchandiseVos(NewShipmentNoticeBo bo) {
