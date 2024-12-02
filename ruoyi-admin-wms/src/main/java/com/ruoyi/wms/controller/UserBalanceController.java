@@ -89,7 +89,7 @@ public class UserBalanceController extends BaseController {
     @SaCheckPermission("wms:balance:edit")
     @Log(title = "用户余额", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping("/")
+    @PutMapping()
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewUserBalanceBo bo) {
         NewFinanceBo newFinanceBo = new NewFinanceBo();
         newFinanceBo.setUserId(bo.getUserId());
