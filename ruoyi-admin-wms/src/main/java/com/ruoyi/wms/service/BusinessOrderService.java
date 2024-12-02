@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderBo;
 import com.ruoyi.wms.domain.bo.financial.NewFinanceBo;
 import com.ruoyi.wms.domain.entity.BusinessOrder;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
@@ -108,10 +109,13 @@ public class BusinessOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewOrderBo bo) {
+        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
+        bo.setUserId(id);
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
 
         checkAndUpdateUserBalance(businessOrder);
 
+        businessOrder.setStatus(OrderStatus.PAID.getCode());
         businessOrderMapper.insert(businessOrder);
 
         bo.getMerchandises().forEach(merchandise -> {
@@ -121,9 +125,8 @@ public class BusinessOrderService {
     }
 
     private void checkAndUpdateUserBalance(@NotNull BusinessOrder bo) {
-        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
         NewFinanceBo newFinanceBo = new NewFinanceBo();
-        newFinanceBo.setUserId(id);
+        newFinanceBo.setUserId(bo.getUserId());
         newFinanceBo.setState(FinancialState.EXPENDITURE.getCode());
         newFinanceBo.setEvent("订单支出： " + bo.getId());
         newFinanceBo.setAmount(bo.getTotalAmount());
@@ -131,9 +134,41 @@ public class BusinessOrderService {
     }
 
     /**
+     * 新增草稿
+     * @param bo
+     */
+    @Transactional(rollbackFor = Exception.class)
+    public void insertByDraftBo(NewOrderBo bo) {
+        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
+        bo.setUserId(id);
+        BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
+        businessOrderMapper.insert(businessOrder);
+
+        bo.getMerchandises().forEach(merchandise -> {
+            merchandise.setOrderId(businessOrder.getId());
+            orderMerchandiseService.insertByBo(merchandise);
+        });
+    }
+
+    /**
+     * 修改订单状态
+     */
+    public void updateStatus(NewOrderBo bo){
+        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
+        bo.setUserId(id);
+        BusinessOrderVo businessOrderVo = queryById(bo.getId());
+
+        BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
+        if(businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())){
+            checkAndUpdateUserBalance(businessOrder);
+        }
+        businessOrderMapper.updateById(businessOrder);
+    }
+
+    /**
      * 修改订单表
      */
-    public void updateByBo(NewOrderBo bo) {
+    public void updateByBo(UpdateOrderBo bo) {
         BusinessOrder update = MapstructUtils.convert(bo, BusinessOrder.class);
         businessOrderMapper.updateById(update);
     }

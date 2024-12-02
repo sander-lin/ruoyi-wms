@@ -5,6 +5,7 @@ import java.util.List;
 import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderBo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
 import com.ruoyi.wms.service.BusinessOrderService;
@@ -93,13 +94,25 @@ public class BusinessOrderController extends BaseController {
     }
 
     /**
+     * 新增草稿订单表
+     */
+    @SaCheckPermission("wms:order:add")
+    @Log(title = "订单表", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping("/draft")
+    public R<Void> addDraft(@Validated(AddGroup.class) @RequestBody NewOrderBo bo) {
+        orderService.insertByDraftBo(bo);
+        return R.ok();
+    }
+
+    /**
      * 修改订单表
      */
     @SaCheckPermission("wms:order:edit")
     @Log(title = "订单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody UpdateOrderBo bo) {
         orderService.updateByBo(bo);
         return R.ok();
     }
