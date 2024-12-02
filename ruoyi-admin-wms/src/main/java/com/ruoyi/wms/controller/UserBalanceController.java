@@ -94,7 +94,7 @@ public class UserBalanceController extends BaseController {
         NewFinanceBo newFinanceBo = new NewFinanceBo();
         newFinanceBo.setUserId(bo.getUserId());
         newFinanceBo.setAmount(bo.getAmount());
-        newFinanceBo.setEvent(bo.getEvent());
+        newFinanceBo.setEvent("充值");
         newFinanceBo.setState(FinancialState.INCOME.getCode());
 
         userBalanceService.updateByBo(newFinanceBo);
