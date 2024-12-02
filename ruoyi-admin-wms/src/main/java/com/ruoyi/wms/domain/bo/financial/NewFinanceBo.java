@@ -40,9 +40,9 @@ public class NewFinanceBo extends BaseEntity {
     private String state;
 
     /**
-     * 支出订单
+     * 事件
      */
-    private String orderId;
+    private String event;
 
 
 }

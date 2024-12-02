@@ -36,5 +36,10 @@ public class NewUserBalanceBo extends BaseEntity {
     @NotNull(message = "充值金额不能为空", groups = { AddGroup.class, EditGroup.class })
     private BigDecimal amount;
 
+    /**
+     * 事件
+     */
+    @NotNull(message = "事件不能为空", groups = { AddGroup.class, EditGroup.class })
+    private String event;
 
 }

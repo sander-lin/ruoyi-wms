@@ -35,5 +35,4 @@ public class UserBalanceBo extends BaseEntity {
     @NotNull(message = "余额不能为空", groups = { AddGroup.class, EditGroup.class })
     private BigDecimal balance;
 
-
 }

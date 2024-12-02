@@ -99,8 +99,6 @@ public class UserBalanceService {
             }
 
             if(Objects.equals(bo.getState(), FinancialState.EXPENDITURE.getCode())) {
-                if(bo.getOrderId() == null) throw new RuntimeException("订单id为空");
-
                 if( userBalanceVo.getBalance().compareTo(bo.getAmount()) < 0) {
                     throw new RuntimeException("余额不足！");
                 }
@@ -118,7 +116,7 @@ public class UserBalanceService {
         financialBo.setUserId(bo.getUserId());
         financialBo.setAmount(bo.getAmount().toString());
         financialBo.setState(bo.getState());
-        financialBo.setEvent(bo.getOrderId());
+        financialBo.setEvent(bo.getEvent());
         financialBo.setLastBalance(userBalanceVo == null ? "0" : userBalanceVo.getBalance().toString());
         financialService.insertByBo(financialBo);
     }
