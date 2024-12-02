@@ -95,7 +95,7 @@ public class ShipmentNoticeController extends BaseController {
     /**
      * 新增草稿发货请求通知单
      */
-    @SaCheckPermission("wms:shipmentNotice:add")
+    @SaCheckPermission("wms:shipmentNotice:addDraft")
     @Log(title = "发货请求通知单草稿", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/draft")

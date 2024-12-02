@@ -96,7 +96,7 @@ public class BusinessOrderController extends BaseController {
     /**
      * 新增草稿订单表
      */
-    @SaCheckPermission("wms:order:add")
+    @SaCheckPermission("wms:order:addDraft")
     @Log(title = "订单表", businessType = BusinessType.INSERT)
     @RepeatSubmit()
     @PostMapping("/draft")
