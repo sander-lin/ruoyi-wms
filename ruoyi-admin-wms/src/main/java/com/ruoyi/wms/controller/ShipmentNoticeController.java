@@ -3,6 +3,7 @@ package com.ruoyi.wms.controller;
 import java.util.List;
 
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
+import com.ruoyi.wms.domain.bo.shipmentnotice.UpdateShipmentNoticeStatusBo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -87,7 +88,31 @@ public class ShipmentNoticeController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody NewShipmentNoticeBo bo) {
-        shipmentNoticeService.insertByBo(bo);
+        shipmentNoticeService.insertNoticeByBo(bo);
+        return R.ok();
+    }
+
+    /**
+     * 新增草稿发货请求通知单
+     */
+    @SaCheckPermission("wms:shipmentNotice:add")
+    @Log(title = "发货请求通知单草稿", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping("/draft")
+    public R<Void> addDraft(@Validated(AddGroup.class) @RequestBody NewShipmentNoticeBo bo) {
+        shipmentNoticeService.insertNoticeDraftByBo(bo);
+        return R.ok();
+    }
+
+    /**
+     * 修改发货请求通知单状态
+     */
+    @SaCheckPermission("wms:shipmentNotice:edit")
+    @Log(title = "发货请求通知单", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/status")
+    public R<Void> editStatus(@Validated(EditGroup.class) @RequestBody UpdateShipmentNoticeStatusBo bo) {
+        shipmentNoticeService.UpdateStatus(bo);
         return R.ok();
     }
 

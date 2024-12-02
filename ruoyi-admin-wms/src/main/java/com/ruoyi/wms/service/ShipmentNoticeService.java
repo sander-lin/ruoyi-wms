@@ -7,6 +7,7 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.wms.domain.bo.shipmentnotice.UpdateShipmentNoticeStatusBo;
 import com.ruoyi.wms.domain.entity.*;
 import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
@@ -106,6 +107,7 @@ public class ShipmentNoticeService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewShipmentNoticeBo bo) {
+        bo.setStatus(ShipmentNoticeStatus.PENDING.getCode());
         ShipmentNotice add = MapstructUtils.convert(bo, ShipmentNotice.class);
         shipmentNoticeMapper.insert(add);
 
@@ -125,6 +127,20 @@ public class ShipmentNoticeService {
 
             shipmentNoticeMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
         });
+    }
+
+    public void insertNoticeByBo(NewShipmentNoticeBo bo) {
+        bo.setStatus(ShipmentNoticeStatus.PENDING.getCode());
+        insertByBo(bo);
+    }
+
+    public void insertNoticeDraftByBo(NewShipmentNoticeBo bo) {
+        bo.setStatus(ShipmentNoticeStatus.DRAFT.getCode());
+        insertByBo(bo);
+    }
+
+    public void UpdateStatus(UpdateShipmentNoticeStatusBo bo) {
+        shipmentNoticeMapper.updateById(MapstructUtils.convert(bo, ShipmentNotice.class));
     }
 
     private void checkQuantityNotice(
