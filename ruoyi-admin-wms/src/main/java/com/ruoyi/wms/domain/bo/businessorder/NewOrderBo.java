@@ -53,7 +53,7 @@
      private String remark;
 
      @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
-     private BigDecimal totalAmount;
+     private String totalAmount;
 
      private List<BusinessOrderMerchandiseBo> merchandises;
  }

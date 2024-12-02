@@ -96,14 +96,15 @@ public class UserBalanceService {
         } else {
             update.setId(userBalanceVo.getId());
             if(Objects.equals(bo.getState(), FinancialState.INCOME.getCode())) {
-                update.setBalance(bo.getAmount().add(userBalanceVo.getBalance()));
+                update.setBalance(new BigDecimal(bo.getAmount()).add(userBalanceVo.getBalance()));
             }
 
             if(Objects.equals(bo.getState(), FinancialState.EXPENDITURE.getCode())) {
-                if( userBalanceVo.getBalance().compareTo(bo.getAmount()) < 0) {
+                BigDecimal amount = new BigDecimal(bo.getAmount());
+                if( userBalanceVo.getBalance().compareTo(amount) < 0) {
                     throw new RuntimeException("余额不足！");
                 }
-                update.setBalance(userBalanceVo.getBalance().subtract(bo.getAmount()));
+                update.setBalance(userBalanceVo.getBalance().subtract(amount));
             }
         }
 
@@ -119,7 +120,7 @@ public class UserBalanceService {
         financialBo.setAmount(bo.getAmount().toString());
         financialBo.setState(bo.getState());
         financialBo.setEvent(bo.getEvent());
-        financialBo.setLastBalance(userBalanceVo.getBalance());
+        financialBo.setLastBalance(userBalanceVo.getBalance().toString());
         financialService.insertByBo(financialBo);
     }
 

@@ -34,7 +34,7 @@ public class NewUserBalanceBo extends BaseEntity {
      * 充值金额
      */
     @NotNull(message = "充值金额不能为空", groups = { AddGroup.class, EditGroup.class })
-    private BigDecimal amount;
+    private String amount;
 
     /**
      * 事件

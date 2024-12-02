@@ -32,7 +32,7 @@ public class NewFinanceBo extends BaseEntity {
      * 金额
      */
     @NotNull(message = "金额不能为空", groups = { AddGroup.class, EditGroup.class })
-    private BigDecimal amount;
+    private String amount;
 
     /**
      * 支出 1 收入 0
