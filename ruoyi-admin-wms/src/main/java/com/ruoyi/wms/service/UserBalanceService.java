@@ -90,28 +90,34 @@ public class UserBalanceService {
         lqw.eq(UserBalance::getUserId, bo.getUserId());
         UserBalanceVo userBalanceVo = userBalanceMapper.selectVoOne(lqw);
 
-        if(userBalanceVo == null) {
-            userBalanceVo = new UserBalanceVo();
-            userBalanceVo.setBalance(new BigDecimal("0"));
-        } else {
-            update.setId(userBalanceVo.getId());
-            if(Objects.equals(bo.getState(), FinancialState.INCOME.getCode())) {
-                update.setBalance(new BigDecimal(bo.getAmount()).add(userBalanceVo.getBalance()));
-            }
-
-            if(Objects.equals(bo.getState(), FinancialState.EXPENDITURE.getCode())) {
-                BigDecimal amount = new BigDecimal(bo.getAmount());
-                if( userBalanceVo.getBalance().compareTo(amount) < 0) {
-                    throw new RuntimeException("余额不足！");
-                }
-                update.setBalance(userBalanceVo.getBalance().subtract(amount));
-            }
-        }
+        userBalanceVo = getUserBalanceVo(bo, userBalanceVo, update);
 
         updateFinancial(bo, userBalanceVo);
 
         userBalances.add(update);
         userBalanceMapper.insertOrUpdateBatch(userBalances);
+    }
+
+    @NotNull
+    private static UserBalanceVo getUserBalanceVo(NewFinanceBo bo, UserBalanceVo userBalanceVo, UserBalance update) {
+        if(userBalanceVo == null) {
+            userBalanceVo = new UserBalanceVo();
+            userBalanceVo.setBalance(new BigDecimal("0"));
+        }
+
+        update.setId(userBalanceVo.getId());
+        if(Objects.equals(bo.getState(), FinancialState.INCOME.getCode())) {
+            update.setBalance(new BigDecimal(bo.getAmount()).add(userBalanceVo.getBalance()));
+        }
+
+        if(Objects.equals(bo.getState(), FinancialState.EXPENDITURE.getCode())) {
+            BigDecimal amount = new BigDecimal(bo.getAmount());
+            if( userBalanceVo.getBalance().compareTo(amount) < 0) {
+                throw new RuntimeException("余额不足！");
+            }
+            update.setBalance(userBalanceVo.getBalance().subtract(amount));
+        }
+        return userBalanceVo;
     }
 
     private void updateFinancial(@NotNull NewFinanceBo bo,@NotNull UserBalanceVo userBalanceVo) {
