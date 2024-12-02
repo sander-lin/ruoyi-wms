@@ -92,6 +92,7 @@ public class UserBalanceController extends BaseController {
     @PutMapping("/")
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewUserBalanceBo bo) {
         NewFinanceBo newFinanceBo = new NewFinanceBo();
+        newFinanceBo.setUserId(bo.getUserId());
         newFinanceBo.setAmount(bo.getAmount());
         newFinanceBo.setState(FinancialState.INCOME.getCode());
 
