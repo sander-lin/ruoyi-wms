@@ -39,7 +39,9 @@ public class UserBalanceService {
      * 查询用户余额
      */
     public UserBalanceVo queryById(String id){
-        return userBalanceMapper.selectVoById(id);
+        UserBalanceBo userBalanceBo = new UserBalanceBo();
+        userBalanceBo.setUserId(id);
+        return userBalanceMapper.selectVoOne(buildQueryWrapper(userBalanceBo));
     }
 
     /**
