@@ -93,7 +93,7 @@ public class UserBalanceController extends BaseController {
     public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewUserBalanceBo bo) {
         NewFinanceBo newFinanceBo = new NewFinanceBo();
         newFinanceBo.setAmount(bo.getAmount());
-        newFinanceBo.setState(FinancialState.INCOME);
+        newFinanceBo.setState(FinancialState.INCOME.getCode());
 
         userBalanceService.updateByBo(newFinanceBo);
         return R.ok();

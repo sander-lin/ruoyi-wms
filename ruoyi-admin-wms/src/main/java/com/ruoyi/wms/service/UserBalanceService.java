@@ -94,11 +94,11 @@ public class UserBalanceService {
             userBalance.setBalance(new BigDecimal("0"));
             userBalanceMapper.insert(userBalance);
         } else {
-            if(bo.getState() == FinancialState.INCOME) {
+            if(bo.getState() == FinancialState.INCOME.getCode()) {
                 update.setBalance(bo.getAmount().add(userBalanceVo.getBalance()));
             }
 
-            if(bo.getState() == FinancialState.EXPENDITURE) {
+            if(bo.getState() == FinancialState.EXPENDITURE.getCode()) {
                 if(bo.getOrderId() == null) throw new RuntimeException("订单id为空");
 
                 if( userBalanceVo.getBalance().compareTo(bo.getAmount()) < 0) {

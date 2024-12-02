@@ -44,8 +44,16 @@ public class ShipmentNoticeController extends BaseController {
     @SaCheckPermission("wms:shipmentNotice:list")
     @GetMapping("/list")
     public TableDataInfo<ShipmentNoticeVo> list(ShipmentNoticeBo bo, PageQuery pageQuery) {
-//        return shipmentNoticeService.queryPageList(bo, pageQuery);
         return shipmentNoticeService.queryShipmentNoticeList(bo, pageQuery);
+    }
+
+    /**
+     * 查询发货请求通知单列表
+     */
+    @SaCheckPermission("wms:shipmentNotice:draftList")
+    @GetMapping("/list/draft")
+    public TableDataInfo<ShipmentNoticeVo> draftList(ShipmentNoticeBo bo, PageQuery pageQuery) {
+        return shipmentNoticeService.queryShipmentNoticeDraftList(bo, pageQuery);
     }
 
     /**

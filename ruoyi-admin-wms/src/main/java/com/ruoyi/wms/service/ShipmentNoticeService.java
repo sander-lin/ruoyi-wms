@@ -14,6 +14,7 @@ import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeMerchandiseBo;
 import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
+import com.ruoyi.wms.enums.ShipmentNoticeStatus;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
@@ -54,9 +55,23 @@ public class ShipmentNoticeService {
 
     public TableDataInfo<ShipmentNoticeVo> queryShipmentNoticeList(ShipmentNoticeBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<ShipmentNotice> lqw = buildQueryWrapper(bo);
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus())
+            && !bo.getStatus().equals(ShipmentNoticeStatus.DRAFT.getCode()),
+            ShipmentNotice::getStatus, bo.getStatus());
+
         Page<ShipmentNoticeVo> result = shipmentNoticeMapper.selectShipmentNoticeVoList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
+
+    public TableDataInfo<ShipmentNoticeVo> queryShipmentNoticeDraftList(ShipmentNoticeBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<ShipmentNotice> lqw = buildQueryWrapper(bo);
+        lqw.eq(ShipmentNotice::getStatus, ShipmentNoticeStatus.DRAFT.getCode());
+
+        Page<ShipmentNoticeVo> result = shipmentNoticeMapper.selectShipmentNoticeVoList(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
+    }
+
+
     /**
      * 查询发货请求通知单列表
      */
@@ -80,7 +95,6 @@ public class ShipmentNoticeService {
         lqw.eq(StringUtils.isNotBlank(bo.getOrderId()), ShipmentNotice::getOrderId, bo.getOrderId());
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), ShipmentNotice::getUserId, bo.getUserId());
         lqw.eq(StringUtils.isNotBlank(bo.getTag()), ShipmentNotice::getTag, bo.getTag());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), ShipmentNotice::getStatus, bo.getStatus());
         lqw.eq(StringUtils.isNotBlank(bo.getDeliveryMethod()), ShipmentNotice::getDeliveryMethod, bo.getDeliveryMethod());
         lqw.eq(ShipmentNotice::getIsDelete,false);
         lqw.orderByDesc(ShipmentNotice::getUpdateTime);

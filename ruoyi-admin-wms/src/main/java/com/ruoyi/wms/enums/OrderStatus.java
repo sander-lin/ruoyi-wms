@@ -5,9 +5,11 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum FinancialState {
-    INCOME("收入", "0"),
-    EXPENDITURE("支出","1");
+public enum OrderStatus {
+    DRAFT("草稿","1"),
+    PAID("买付中","2"),
+    DELIVERING("配送中","3"),
+    COMPLETED("已完成","4");
 
     private final String desc;
     private final String code;

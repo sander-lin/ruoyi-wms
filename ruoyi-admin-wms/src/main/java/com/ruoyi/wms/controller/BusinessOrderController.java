@@ -49,6 +49,15 @@ public class BusinessOrderController extends BaseController {
     }
 
     /**
+     * 查询草稿订单表列表
+     */
+    @SaCheckPermission("wms:order:draftList")
+    @GetMapping("/list/draft")
+    public TableDataInfo<BusinessOrderVo> draftLists(BusinessOrderBo bo, PageQuery pageQuery) {
+        return orderService.queryDraftOrderList(bo, pageQuery);
+    }
+
+    /**
      * 获取订单表详细信息
      *
      * @param id 主键

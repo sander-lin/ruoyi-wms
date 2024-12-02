@@ -37,7 +37,7 @@ public class NewFinanceBo extends BaseEntity {
     /**
      * 支出 1 收入 0
      */
-    private FinancialState state;
+    private String state;
 
     /**
      * 支出订单

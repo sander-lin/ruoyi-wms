@@ -41,7 +41,7 @@ public class FinancialBo extends BaseEntity {
      * 支出，收入状态
      */
     @NotBlank(message = "支出，收入状态不能为空", groups = { AddGroup.class, EditGroup.class })
-    private FinancialState state;
+    private String state;
 
     /**
      * 金额

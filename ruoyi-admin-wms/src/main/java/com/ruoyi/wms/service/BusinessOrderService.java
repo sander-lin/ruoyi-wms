@@ -19,6 +19,7 @@ import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.enums.FinancialState;
+import com.ruoyi.wms.enums.OrderStatus;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import lombok.RequiredArgsConstructor;
@@ -68,9 +69,21 @@ public class BusinessOrderService {
 
     public TableDataInfo<BusinessOrderVo> queryOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus())
+                && !Objects.equals(bo.getStatus(), OrderStatus.DRAFT.getCode()),
+            BusinessOrder::getStatus, bo.getStatus());
         Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
+
+    public TableDataInfo<BusinessOrderVo> queryDraftOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
+        LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
+        lqw.eq(BusinessOrder::getStatus, OrderStatus.DRAFT.getCode());
+        Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
+    }
+
+
 
     /**
      * 查询订单表列表
@@ -85,7 +98,6 @@ public class BusinessOrderService {
         LambdaQueryWrapper<BusinessOrder> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), BusinessOrder::getUserId, bo.getUserId());
         lqw.eq(StringUtils.isNotBlank(bo.getType()), BusinessOrder::getType, bo.getType());
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BusinessOrder::getStatus, bo.getStatus());
         lqw.eq(BusinessOrder::getIsDelete,false);
         lqw.orderByDesc(BusinessOrder::getUpdateTime);
         return lqw;
@@ -110,12 +122,12 @@ public class BusinessOrderService {
 
     private void checkAndUpdateUserBalance(@NotNull BusinessOrder bo) {
         String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
-        NewFinanceBo newUserBalanceBo = new NewFinanceBo();
-        newUserBalanceBo.setUserId(id);
-        newUserBalanceBo.setState(FinancialState.EXPENDITURE);
-        newUserBalanceBo.setOrderId(bo.getId());
-        newUserBalanceBo.setAmount(bo.getTotalAmount());
-        userBalanceService.updateByBo(newUserBalanceBo);
+        NewFinanceBo newFinanceBo = new NewFinanceBo();
+        newFinanceBo.setUserId(id);
+        newFinanceBo.setState(FinancialState.EXPENDITURE.getCode());
+        newFinanceBo.setOrderId(bo.getId());
+        newFinanceBo.setAmount(bo.getTotalAmount());
+        userBalanceService.updateByBo(newFinanceBo);
     }
 
     /**
