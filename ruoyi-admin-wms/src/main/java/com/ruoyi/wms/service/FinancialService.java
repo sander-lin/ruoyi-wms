@@ -9,7 +9,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ruoyi.wms.domain.bo.FinancialBo;
+import com.ruoyi.wms.domain.bo.financial.FinancialBo;
 import com.ruoyi.wms.domain.vo.FinancialVo;
 import com.ruoyi.wms.domain.entity.Financial;
 import com.ruoyi.wms.mapper.FinancialMapper;

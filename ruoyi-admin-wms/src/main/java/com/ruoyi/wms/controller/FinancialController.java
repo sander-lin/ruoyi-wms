@@ -18,7 +18,7 @@ import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.wms.domain.vo.FinancialVo;
-import com.ruoyi.wms.domain.bo.FinancialBo;
+import com.ruoyi.wms.domain.bo.financial.FinancialBo;
 import com.ruoyi.wms.service.FinancialService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 

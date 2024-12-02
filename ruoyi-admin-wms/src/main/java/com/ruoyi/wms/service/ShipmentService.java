@@ -15,6 +15,7 @@ import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
 import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
+import com.ruoyi.wms.enums.ShipmentNoticeStatus;
 import com.ruoyi.wms.mapper.*;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -121,10 +122,10 @@ public class ShipmentService {
 
     private void checkInventory(ShipmentMerchandiseBo merchandise, Inventories inventory) {
         if (inventory == null)
-            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 库存中不存在该商品！");
+            throw new RuntimeException(merchandise.getMerchandiseId() + " 库存中不存在该商品！");
 
         if (inventory.getNumber() < merchandise.getQuantityShipped()) {
-            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品库存不足！");
+            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品库存不足！");
         }
     }
 
@@ -146,7 +147,7 @@ public class ShipmentService {
             .sum();
 
         if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
-            throw new IllegalArgumentException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
+            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
         }
     }
 
@@ -212,26 +213,6 @@ public class ShipmentService {
         lqw.eq(ShipmentNoticeMerchandise::getIsDelete,false);
         long count = shipmentNoticeMerchandiseMapper.selectCount(lqw);
         return count > 0;
-    }
-
-    @Getter
-    private enum ShipmentNoticeStatus {
-        PENDING("未发货", "1"),
-        PART_SHIPPED("部分发货", "2"),
-        ALL_SHIPPED("全部发货", "3"),
-        COMPLETED("已完成", "4"),
-        CLOSED("已关闭", "5");
-
-        // 获取枚举常量的描述
-        private final String description;
-        // 获取枚举常量的代码
-        private final String code;
-
-        // 构造方法，设置每个枚举常量的描述和代码
-        ShipmentNoticeStatus(String description, String code) {
-            this.description = description;
-            this.code = code;
-        }
     }
 
     /**

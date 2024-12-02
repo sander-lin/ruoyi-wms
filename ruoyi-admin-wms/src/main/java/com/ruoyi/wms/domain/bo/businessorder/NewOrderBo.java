@@ -9,6 +9,7 @@
  import lombok.Data;
  import lombok.EqualsAndHashCode;
 
+ import java.math.BigDecimal;
  import java.util.List;
 
 
@@ -53,7 +54,7 @@
      private String remark;
 
      @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
-     private String totalAmount;
+     private BigDecimal totalAmount;
 
      private List<BusinessOrderMerchandiseBo> merchandises;
  }

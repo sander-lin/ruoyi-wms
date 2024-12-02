@@ -1,5 +1,6 @@
 package com.ruoyi.wms.service;
 
+import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -9,25 +10,24 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
+import com.ruoyi.wms.domain.bo.financial.NewFinanceBo;
 import com.ruoyi.wms.domain.entity.BusinessOrder;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
-import com.ruoyi.wms.domain.entity.Shipment;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
+import com.ruoyi.wms.enums.FinancialState;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import lombok.RequiredArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.mapper.BusinessOrderMapper;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * 订单表Service业务层处理
@@ -44,6 +44,7 @@ public class BusinessOrderService {
     private final OrderMerchandiseMapper orderMerchandiseMapper;
     private final ShipmentNoticeMapper shipmentNoticeMapper;
     private final ShipmentNoticeService shipmentNoticeService;
+    private final UserBalanceService userBalanceService;
 
     /**
      * 查询订单表
@@ -93,15 +94,28 @@ public class BusinessOrderService {
     /**
      * 新增订单表
      */
-    @Transactional
+    @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewOrderBo bo) {
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
+
+        checkAndUpdateUserBalance(businessOrder);
+
         businessOrderMapper.insert(businessOrder);
 
         bo.getMerchandises().forEach(merchandise -> {
             merchandise.setOrderId(businessOrder.getId());
             orderMerchandiseService.insertByBo(merchandise);
         });
+    }
+
+    private void checkAndUpdateUserBalance(@NotNull BusinessOrder bo) {
+        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
+        NewFinanceBo newUserBalanceBo = new NewFinanceBo();
+        newUserBalanceBo.setUserId(id);
+        newUserBalanceBo.setState(FinancialState.EXPENDITURE);
+        newUserBalanceBo.setOrderId(bo.getId());
+        newUserBalanceBo.setAmount(bo.getTotalAmount());
+        userBalanceService.updateByBo(newUserBalanceBo);
     }
 
     /**

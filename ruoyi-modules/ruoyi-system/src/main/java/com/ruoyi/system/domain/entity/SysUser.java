@@ -15,6 +15,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -80,6 +81,11 @@ public class SysUser extends BaseEntity {
      * 用户性别
      */
     private String sex;
+
+    /**
+     * 用户余额
+     */
+    private BigDecimal balance;
 
     /**
      * 用户头像
