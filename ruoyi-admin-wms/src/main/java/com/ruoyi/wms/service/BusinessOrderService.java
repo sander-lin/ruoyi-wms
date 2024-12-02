@@ -125,7 +125,7 @@ public class BusinessOrderService {
         NewFinanceBo newFinanceBo = new NewFinanceBo();
         newFinanceBo.setUserId(id);
         newFinanceBo.setState(FinancialState.EXPENDITURE.getCode());
-        newFinanceBo.setOrderId(bo.getId());
+        newFinanceBo.setEvent("订单支出： " + bo.getId());
         newFinanceBo.setAmount(bo.getTotalAmount());
         userBalanceService.updateByBo(newFinanceBo);
     }

@@ -69,30 +69,6 @@ public class FinancialController extends BaseController {
     }
 
     /**
-     * 新增资金明细表
-     */
-    @SaCheckPermission("wms:financial:add")
-    @Log(title = "资金明细表", businessType = BusinessType.INSERT)
-    @RepeatSubmit()
-    @PostMapping()
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody FinancialBo bo) {
-        financialService.insertByBo(bo);
-        return R.ok();
-    }
-
-    /**
-     * 修改资金明细表
-     */
-    @SaCheckPermission("wms:financial:edit")
-    @Log(title = "资金明细表", businessType = BusinessType.UPDATE)
-    @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody FinancialBo bo) {
-        financialService.updateByBo(bo);
-        return R.ok();
-    }
-
-    /**
      * 删除资金明细表
      *
      * @param ids 主键串

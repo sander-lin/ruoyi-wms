@@ -83,17 +83,16 @@ public class UserBalanceService {
         UserBalance update = new UserBalance();
         update.setUserId(bo.getUserId());
         List<UserBalance> userBalances = new ArrayList<>();
-        userBalances.add(update);
 
         LambdaQueryWrapper<UserBalance> lqw = Wrappers.lambdaQuery();
         lqw.eq(UserBalance::getUserId, bo.getUserId());
         UserBalanceVo userBalanceVo = userBalanceMapper.selectVoOne(lqw);
+
         if(userBalanceVo == null) {
-            UserBalance userBalance = new UserBalance();
-            userBalance.setUserId(bo.getUserId());
-            userBalance.setBalance(new BigDecimal("0"));
-            userBalanceMapper.insert(userBalance);
+            userBalanceVo = new UserBalanceVo();
+            userBalanceVo.setBalance(new BigDecimal("0"));
         } else {
+            update.setId(userBalanceVo.getId());
             if(Objects.equals(bo.getState(), FinancialState.INCOME.getCode())) {
                 update.setBalance(bo.getAmount().add(userBalanceVo.getBalance()));
             }
@@ -108,16 +107,17 @@ public class UserBalanceService {
 
         updateFinancial(bo, userBalanceVo);
 
+        userBalances.add(update);
         userBalanceMapper.insertOrUpdateBatch(userBalances);
     }
 
-    private void updateFinancial(@NotNull NewFinanceBo bo, UserBalanceVo userBalanceVo) {
+    private void updateFinancial(@NotNull NewFinanceBo bo,@NotNull UserBalanceVo userBalanceVo) {
         FinancialBo financialBo = new FinancialBo();
         financialBo.setUserId(bo.getUserId());
         financialBo.setAmount(bo.getAmount().toString());
         financialBo.setState(bo.getState());
         financialBo.setEvent(bo.getEvent());
-        financialBo.setLastBalance(userBalanceVo == null ? "0" : userBalanceVo.getBalance().toString());
+        financialBo.setLastBalance(userBalanceVo.getBalance());
         financialService.insertByBo(financialBo);
     }
 
