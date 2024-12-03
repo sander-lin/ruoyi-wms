@@ -53,7 +53,7 @@ public class BusinessOrderService {
     /**
      * 查询订单表
      */
-    public BusinessOrderVo queryById(String id){
+    public BusinessOrderVo queryById(String id) {
         return businessOrderMapper.selectVoById(id);
     }
 
@@ -72,9 +72,8 @@ public class BusinessOrderService {
 
     public TableDataInfo<BusinessOrderVo> queryOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()),BusinessOrder::getStatus, bo.getStatus());
-        lqw.ne(BusinessOrder::getStatus, bo.getStatus());
-
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BusinessOrder::getStatus, bo.getStatus());
+        lqw.ne(BusinessOrder::getStatus, OrderStatus.DRAFT.getCode());
         Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
@@ -83,7 +82,7 @@ public class BusinessOrderService {
         String userId = StpUtil.getLoginIdAsString().split(":")[1].trim();
         LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
         lqw.eq(BusinessOrder::getStatus, OrderStatus.DRAFT.getCode());
-        lqw.eq(BusinessOrder::getUserId,userId);
+        lqw.eq(BusinessOrder::getUserId, userId);
         Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
@@ -101,7 +100,7 @@ public class BusinessOrderService {
         LambdaQueryWrapper<BusinessOrder> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), BusinessOrder::getUserId, bo.getUserId());
         lqw.eq(StringUtils.isNotBlank(bo.getType()), BusinessOrder::getType, bo.getType());
-        lqw.eq(BusinessOrder::getIsDelete,false);
+        lqw.eq(BusinessOrder::getIsDelete, false);
         lqw.orderByDesc(BusinessOrder::getUpdateTime);
         return lqw;
     }
@@ -138,6 +137,7 @@ public class BusinessOrderService {
 
     /**
      * 新增草稿
+     * 
      * @param bo
      */
     @Transactional(rollbackFor = Exception.class)
@@ -156,13 +156,13 @@ public class BusinessOrderService {
     /**
      * 修改订单状态
      */
-    public void updateStatus(NewOrderBo bo){
+    public void updateStatus(NewOrderBo bo) {
         String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
         bo.setUserId(userId);
         BusinessOrderVo businessOrderVo = queryById(bo.getId());
 
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
-        if(businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())){
+        if (businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())) {
             checkAndUpdateUserBalance(businessOrder);
         }
 
@@ -187,10 +187,10 @@ public class BusinessOrderService {
 
         ids.forEach(id -> {
             List<String> omIds = orderMerchandises.stream()
-                .filter(e -> e.getOrderId().equals(id))
-                .map(OrderMerchandiseVo::getId)
-                .toList();
-            if(!omIds.isEmpty()) {
+                    .filter(e -> e.getOrderId().equals(id))
+                    .map(OrderMerchandiseVo::getId)
+                    .toList();
+            if (!omIds.isEmpty()) {
                 orderMerchandiseService.deleteByIds(omIds);
             }
 
@@ -201,7 +201,7 @@ public class BusinessOrderService {
         });
 
         List<String> shipmentNoticeIds = getShipmentNoticeIdByOrderIds(ids);
-        if(!shipmentNoticeIds.isEmpty()) {
+        if (!shipmentNoticeIds.isEmpty()) {
             shipmentNoticeService.deleteByIds(shipmentNoticeIds);
         }
 
@@ -210,15 +210,15 @@ public class BusinessOrderService {
 
     private List<OrderMerchandiseVo> getOrderMerchandiseVos(Collection<String> ids) {
         LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
-        lqw.in(!ids.isEmpty(),OrderMerchandise::getOrderId, ids);
-        lqw.eq(OrderMerchandise::getIsDelete,false);
+        lqw.in(!ids.isEmpty(), OrderMerchandise::getOrderId, ids);
+        lqw.eq(OrderMerchandise::getIsDelete, false);
         return orderMerchandiseMapper.selectVoList(lqw);
     }
 
-    private List<String> getShipmentNoticeIdByOrderIds(Collection<String> ids){
+    private List<String> getShipmentNoticeIdByOrderIds(Collection<String> ids) {
         LambdaQueryWrapper<ShipmentNotice> lqw = Wrappers.lambdaQuery();
-        lqw.in(!ids.isEmpty(),ShipmentNotice::getOrderId, ids);
-        lqw.eq(ShipmentNotice::getIsDelete,false);
+        lqw.in(!ids.isEmpty(), ShipmentNotice::getOrderId, ids);
+        lqw.eq(ShipmentNotice::getIsDelete, false);
         return shipmentNoticeMapper.selectVoList(lqw).stream().map(ShipmentNoticeVo::getId).toList();
     }
 }

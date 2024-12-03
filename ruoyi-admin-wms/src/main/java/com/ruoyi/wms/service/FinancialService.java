@@ -33,7 +33,7 @@ public class FinancialService {
     /**
      * 查询资金明细表
      */
-    public FinancialVo queryById(String id){
+    public FinancialVo queryById(String id) {
         return financialMapper.selectVoById(id);
     }
 
@@ -61,8 +61,11 @@ public class FinancialService {
         lqw.eq(StringUtils.isNotBlank(bo.getState()), Financial::getState, bo.getState());
         lqw.eq(StringUtils.isNotBlank(bo.getAmount()), Financial::getAmount, bo.getAmount());
         lqw.eq(StringUtils.isNotBlank(bo.getEvent()), Financial::getEvent, bo.getEvent());
-        lqw.eq(Financial::getIsDelete,false);
+        lqw.eq(Financial::getIsDelete, false);
         lqw.orderByDesc(Financial::getCreateTime);
+        lqw.eq(Financial::getIsDelete, false);
+        lqw.ge(StringUtils.isNotBlank(bo.getStartTime()), Financial::getCreateTime, bo.getStartTime());
+        lqw.le(StringUtils.isNotBlank(bo.getEndTime()), Financial::getCreateTime, bo.getEndTime());
         return lqw;
     }
 

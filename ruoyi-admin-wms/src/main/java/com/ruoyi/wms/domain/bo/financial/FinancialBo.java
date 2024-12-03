@@ -12,7 +12,6 @@ import io.github.linpeilie.annotations.AutoMapper;
 
 import java.math.BigDecimal;
 
-
 /**
  * 资金明细表业务对象 financial
  *
@@ -61,4 +60,7 @@ public class FinancialBo extends BaseEntity {
     @NotBlank(message = "上次金额不能为空", groups = { AddGroup.class, EditGroup.class })
     private String lastBalance;
 
+    private String startTime;
+
+    private String endTime;
 }
