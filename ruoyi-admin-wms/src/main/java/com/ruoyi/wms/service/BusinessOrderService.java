@@ -2,12 +2,14 @@ package com.ruoyi.wms.service;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.core.utils.MapstructUtils;
+import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderBo;
@@ -70,21 +72,21 @@ public class BusinessOrderService {
 
     public TableDataInfo<BusinessOrderVo> queryOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus())
-                && !Objects.equals(bo.getStatus(), OrderStatus.DRAFT.getCode()),
-            BusinessOrder::getStatus, bo.getStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus()),BusinessOrder::getStatus, bo.getStatus());
+        lqw.ne(BusinessOrder::getStatus, bo.getStatus());
+
         Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 
     public TableDataInfo<BusinessOrderVo> queryDraftOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
+        String userId = StpUtil.getLoginIdAsString().split(":")[1].trim();
         LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
         lqw.eq(BusinessOrder::getStatus, OrderStatus.DRAFT.getCode());
+        lqw.eq(BusinessOrder::getUserId,userId);
         Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
-
-
 
     /**
      * 查询订单表列表
@@ -109,11 +111,12 @@ public class BusinessOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewOrderBo bo) {
-        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
-        bo.setUserId(id);
+        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+
+        bo.setUserId(userId);
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
 
-        checkAndUpdateUserBalance(businessOrder);
+        SpringUtils.getBean(BusinessOrderService.class).checkAndUpdateUserBalance(businessOrder);
 
         businessOrder.setStatus(OrderStatus.PAID.getCode());
         businessOrderMapper.insert(businessOrder);
@@ -139,8 +142,8 @@ public class BusinessOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByDraftBo(NewOrderBo bo) {
-        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
-        bo.setUserId(id);
+        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+        bo.setUserId(userId);
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
         businessOrderMapper.insert(businessOrder);
 
@@ -154,8 +157,8 @@ public class BusinessOrderService {
      * 修改订单状态
      */
     public void updateStatus(NewOrderBo bo){
-        String id = StpUtil.getLoginIdAsString().split(":")[1].trim();
-        bo.setUserId(id);
+        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+        bo.setUserId(userId);
         BusinessOrderVo businessOrderVo = queryById(bo.getId());
 
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
@@ -207,12 +210,14 @@ public class BusinessOrderService {
     private List<OrderMerchandiseVo> getOrderMerchandiseVos(Collection<String> ids) {
         LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.in(!ids.isEmpty(),OrderMerchandise::getOrderId, ids);
+        lqw.eq(OrderMerchandise::getIsDelete,false);
         return orderMerchandiseMapper.selectVoList(lqw);
     }
 
     private List<String> getShipmentNoticeIdByOrderIds(Collection<String> ids){
         LambdaQueryWrapper<ShipmentNotice> lqw = Wrappers.lambdaQuery();
         lqw.in(!ids.isEmpty(),ShipmentNotice::getOrderId, ids);
+        lqw.eq(ShipmentNotice::getIsDelete,false);
         return shipmentNoticeMapper.selectVoList(lqw).stream().map(ShipmentNoticeVo::getId).toList();
     }
 }

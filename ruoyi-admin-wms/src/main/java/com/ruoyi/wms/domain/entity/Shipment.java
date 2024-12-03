@@ -36,6 +36,10 @@ public class Shipment extends BaseEntity {
      */
     private String status;
     /**
+     * 用户id
+     */
+    private String userId;
+    /**
      * 物流渠道
      */
     private String deliveryMethod;

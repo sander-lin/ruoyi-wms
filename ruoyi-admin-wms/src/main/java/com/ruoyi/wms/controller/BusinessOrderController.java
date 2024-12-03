@@ -2,7 +2,6 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderBo;

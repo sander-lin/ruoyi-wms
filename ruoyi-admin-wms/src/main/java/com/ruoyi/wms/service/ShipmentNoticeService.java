@@ -1,6 +1,7 @@
 package com.ruoyi.wms.service;
 
 import com.ruoyi.common.core.utils.MapstructUtils;
+import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -56,9 +57,8 @@ public class ShipmentNoticeService {
 
     public TableDataInfo<ShipmentNoticeVo> queryShipmentNoticeList(ShipmentNoticeBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<ShipmentNotice> lqw = buildQueryWrapper(bo);
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus())
-            && !bo.getStatus().equals(ShipmentNoticeStatus.DRAFT.getCode()),
-            ShipmentNotice::getStatus, bo.getStatus());
+        lqw.eq(StringUtils.isNotBlank(bo.getStatus()),ShipmentNotice::getStatus, bo.getStatus());
+        lqw.ne(ShipmentNotice::getStatus, ShipmentNoticeStatus.DRAFT.getCode());
 
         Page<ShipmentNoticeVo> result = shipmentNoticeMapper.selectShipmentNoticeVoList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
@@ -131,12 +131,12 @@ public class ShipmentNoticeService {
 
     public void insertNoticeByBo(NewShipmentNoticeBo bo) {
         bo.setStatus(ShipmentNoticeStatus.PENDING.getCode());
-        insertByBo(bo);
+        SpringUtils.getBean(ShipmentNoticeService.class).insertByBo(bo);
     }
 
     public void insertNoticeDraftByBo(NewShipmentNoticeBo bo) {
         bo.setStatus(ShipmentNoticeStatus.DRAFT.getCode());
-        insertByBo(bo);
+        SpringUtils.getBean(ShipmentNoticeService.class).insertByBo(bo);
     }
 
     public void UpdateStatus(UpdateShipmentNoticeStatusBo bo) {
@@ -169,6 +169,8 @@ public class ShipmentNoticeService {
     private List<OrderMerchandiseVo> getOrderMerchandiseVos(NewShipmentNoticeBo bo) {
         LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getOrderId()),OrderMerchandise::getOrderId, bo.getOrderId());
+        lqw.eq(OrderMerchandise::getIsDelete,false);
+
         return orderMerchandiseMapper.selectVoList(lqw);
     }
 
@@ -176,6 +178,8 @@ public class ShipmentNoticeService {
         LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),OrderMerchandise::getMerchandiseId,bo.getMerchandiseId());
         lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),OrderMerchandise::getOrderId,bo.getOrderId());
+        lqw.eq(OrderMerchandise::getIsDelete,false);
+
         long count = orderMerchandiseMapper.selectCount(lqw);
         return count > 0;
     }
@@ -183,11 +187,13 @@ public class ShipmentNoticeService {
     public List<ShipmentNoticeMerchandiseVo> selectNoticeMerchandiseByOrderId(String id){
         LambdaQueryWrapper<ShipmentNotice> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(id),ShipmentNotice::getOrderId,id);
+        lqw.eq(ShipmentNotice::getIsDelete,false);
 
         List<String> ids = shipmentNoticeMapper.selectVoList(lqw).stream().map(ShipmentNoticeVo::getId).toList();
 
         LambdaQueryWrapper<ShipmentNoticeMerchandise> lqwSM = Wrappers.lambdaQuery();
         lqwSM.in(!ids.isEmpty(), ShipmentNoticeMerchandise::getShipmentNoticeId,ids);
+        lqwSM.eq(ShipmentNoticeMerchandise::getIsDelete,false);
         return shipmentNoticeMerchandiseMapper.selectVoList(lqwSM);
     }
 
@@ -240,6 +246,8 @@ public class ShipmentNoticeService {
     private List<ShipmentNoticeMerchandiseVo> getShipmentNoticeMerchandiseVos(Collection<String> ids) {
         LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.in(!ids.isEmpty(),ShipmentNoticeMerchandise::getShipmentNoticeId, ids);
+        lqw.eq(ShipmentNoticeMerchandise::getIsDelete,false);
+
         return shipmentNoticeMerchandiseMapper.selectVoList(lqw);
     }
 

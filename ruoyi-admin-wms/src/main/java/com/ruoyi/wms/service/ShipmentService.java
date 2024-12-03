@@ -88,12 +88,7 @@ public class ShipmentService {
     public void insertByBo(NewShipmentBo bo) {
         Shipment add = MapstructUtils.convert(bo, Shipment.class);
         shipmentMapper.insert(add);
-        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
-
-        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),
-            ShipmentNoticeMerchandise::getShipmentNoticeId, bo.getShipmentNoticeId());
-
-        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = shipmentNoticeMerchandiseMapper.selectVoList(lqw);
+        List<ShipmentNoticeMerchandiseVo> shipmentNoticeMerchandises = getShipmentNoticeMerchandiseVos(bo);
         List<ShipmentMerchandiseVo> shipmentMerchandises = selectShipmentMerchandiseByShipmentNoticeId(bo.getShipmentNoticeId());
 
         for (ShipmentMerchandiseBo merchandise : bo.getMerchandises()) {
@@ -117,7 +112,16 @@ public class ShipmentService {
             inventoriesMapper.updateInventoryById(inventory);
         }
 
-        checkAndSetShipmentNoticeStatus(bo);
+       checkAndSetShipmentNoticeStatus(bo);
+    }
+
+    private List<ShipmentNoticeMerchandiseVo> getShipmentNoticeMerchandiseVos(NewShipmentBo bo) {
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),
+            ShipmentNoticeMerchandise::getShipmentNoticeId, bo.getShipmentNoticeId());
+        lqw.eq(ShipmentNoticeMerchandise::getIsDelete,false);
+
+        return shipmentNoticeMerchandiseMapper.selectVoList(lqw);
     }
 
     private void checkInventory(ShipmentMerchandiseBo merchandise, Inventories inventory) {
@@ -155,11 +159,14 @@ public class ShipmentService {
 
         LambdaQueryWrapper<Shipment> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(id),Shipment::getShipmentNoticeId,id);
+        lqw.eq(Shipment::getIsDelete,false);
 
         List<String> ids = shipmentMapper.selectVoList(lqw).stream().map(ShipmentVo::getId).toList();
 
         LambdaQueryWrapper<ShipmentMerchandise> lqwSM = Wrappers.lambdaQuery();
         lqwSM.in(!ids.isEmpty(), ShipmentMerchandise::getShipmentId,ids);
+        lqwSM.eq( ShipmentMerchandise::getIsDelete,false);
+
         return shipmentMerchandiseMapper.selectVoList(lqwSM);
     }
 
@@ -258,6 +265,8 @@ public class ShipmentService {
     private List<ShipmentMerchandiseVo> getShipmentMerchandiseVos(Collection<String> ids) {
         LambdaQueryWrapper<ShipmentMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.in(!ids.isEmpty(),ShipmentMerchandise::getShipmentId, ids);
+        lqw.eq(ShipmentMerchandise::getIsDelete,false);
+
         return shipmentMerchandiseMapper.selectVoList(lqw);
     }
 }
