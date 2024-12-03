@@ -28,7 +28,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             from shipment_notice sn2
             inner join shipment s2 on s2.shipment_notice_id = sn2.id
             inner join shipment_merchandise sm2 on sm2.shipment_id = s2.id
-            where sm2.is_delete = 0 and sn2.status != 0
+            where sm2.is_delete = 0 and sn2.status != 1
             group by sm2.merchandise_id
         ) sqs on sqs.merchandise_id = m.id
         inner join shipment_notice_merchandise snm on snm.merchandise_id = m.id and snm.shipment_notice_id = sn.id

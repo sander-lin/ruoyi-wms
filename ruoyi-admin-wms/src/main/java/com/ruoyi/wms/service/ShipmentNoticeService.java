@@ -16,6 +16,7 @@ import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeMerchandiseBo;
 import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
+import com.ruoyi.wms.enums.OrderStatus;
 import com.ruoyi.wms.enums.ShipmentNoticeStatus;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentMapper;
@@ -27,10 +28,7 @@ import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Collection;
+import java.util.*;
 
 /**
  * 发货请求通知单Service业务层处理
@@ -168,7 +166,7 @@ public class ShipmentNoticeService {
 
     private List<OrderMerchandiseVo> getOrderMerchandiseVos(NewShipmentNoticeBo bo) {
         LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
-        lqw.eq(StringUtils.isNotBlank(bo.getOrderId()),OrderMerchandise::getOrderId, bo.getOrderId());
+        lqw.eq(!Objects.equals(bo.getStatus(), OrderStatus.DRAFT.getCode()),OrderMerchandise::getOrderId, bo.getOrderId());
         lqw.eq(OrderMerchandise::getIsDelete,false);
 
         return orderMerchandiseMapper.selectVoList(lqw);
@@ -177,7 +175,7 @@ public class ShipmentNoticeService {
     private Boolean checkMerchandiseInOrder(ShipmentNoticeMerchandiseBo bo) {
         LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getMerchandiseId()),OrderMerchandise::getMerchandiseId,bo.getMerchandiseId());
-        lqw.eq(StringUtils.isNotBlank(bo.getShipmentNoticeId()),OrderMerchandise::getOrderId,bo.getOrderId());
+        lqw.eq(StringUtils.isNotBlank(bo.getOrderId()),OrderMerchandise::getOrderId,bo.getOrderId());
         lqw.eq(OrderMerchandise::getIsDelete,false);
 
         long count = orderMerchandiseMapper.selectCount(lqw);
@@ -187,6 +185,7 @@ public class ShipmentNoticeService {
     public List<ShipmentNoticeMerchandiseVo> selectNoticeMerchandiseByOrderId(String id){
         LambdaQueryWrapper<ShipmentNotice> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(id),ShipmentNotice::getOrderId,id);
+        lqw.ne(ShipmentNotice::getStatus, ShipmentNoticeStatus.DRAFT.getCode());
         lqw.eq(ShipmentNotice::getIsDelete,false);
 
         List<String> ids = shipmentNoticeMapper.selectVoList(lqw).stream().map(ShipmentNoticeVo::getId).toList();

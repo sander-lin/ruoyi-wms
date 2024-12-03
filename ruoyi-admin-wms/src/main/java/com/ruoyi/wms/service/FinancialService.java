@@ -62,6 +62,7 @@ public class FinancialService {
         lqw.eq(StringUtils.isNotBlank(bo.getAmount()), Financial::getAmount, bo.getAmount());
         lqw.eq(StringUtils.isNotBlank(bo.getEvent()), Financial::getEvent, bo.getEvent());
         lqw.eq(Financial::getIsDelete,false);
+        lqw.orderByDesc(Financial::getCreateTime);
         return lqw;
     }
 

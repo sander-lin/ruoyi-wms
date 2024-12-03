@@ -19,13 +19,10 @@ import org.apache.ibatis.annotations.Param;
  * @author zcc
  * @date 2024-11-11
  */
+@DataPermission({
+    @DataColumn(key = "userName", value = "user_id")
+})
 public interface BusinessOrderMapper extends BaseMapperPlus<BusinessOrder, BusinessOrderVo> {
-    @DataPermission({
-        @DataColumn(key = "userName", value = "user_id")
-    })
     Page<BusinessOrderVo> selectOrderList(Page<BusinessOrderVo> page,@Param(Constants.WRAPPER) Wrapper<BusinessOrder> queryWrapper);
-    @DataPermission({
-        @DataColumn(key = "userName", value = "user_id")
-    })
     BusinessOrderDetailVo selectOrderDetailById(@Param("id") Long id);
 }

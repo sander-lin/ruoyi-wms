@@ -116,7 +116,7 @@ public class BusinessOrderService {
         bo.setUserId(userId);
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
 
-        SpringUtils.getBean(BusinessOrderService.class).checkAndUpdateUserBalance(businessOrder);
+        checkAndUpdateUserBalance(businessOrder);
 
         businessOrder.setStatus(OrderStatus.PAID.getCode());
         businessOrderMapper.insert(businessOrder);
@@ -165,6 +165,7 @@ public class BusinessOrderService {
         if(businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())){
             checkAndUpdateUserBalance(businessOrder);
         }
+
         businessOrderMapper.updateById(businessOrder);
     }
 

@@ -17,14 +17,11 @@ import org.apache.ibatis.annotations.Param;
  * @author huiwei
  * @date 2024-11-18
  */
+@DataPermission({
+    @DataColumn(key = "userName", value = "user_id")
+})
 public interface ShipmentNoticeMapper extends BaseMapperPlus<ShipmentNotice, ShipmentNoticeVo> {
-    @DataPermission({
-        @DataColumn(key = "userName", value = "user_id")
-    })
     Page<ShipmentNoticeVo> selectShipmentNoticeVoList(Page<ShipmentNoticeVo> page, @Param(Constants.WRAPPER) Wrapper<ShipmentNotice> queryWrapper);
-    @DataPermission({
-        @DataColumn(key = "userName", value = "user_id")
-    })
     ShipmentNoticeDetailVo selectShipmentNoticeById(@Param("id") long id);
 }
 
