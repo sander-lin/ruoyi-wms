@@ -115,10 +115,10 @@ public class BusinessOrderService {
         bo.setUserId(userId);
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
 
-        checkAndUpdateUserBalance(businessOrder);
-
         businessOrder.setStatus(OrderStatus.PAID.getCode());
         businessOrderMapper.insert(businessOrder);
+
+        checkAndUpdateUserBalance(businessOrder);
 
         bo.getMerchandises().forEach(merchandise -> {
             merchandise.setOrderId(businessOrder.getId());
@@ -137,7 +137,7 @@ public class BusinessOrderService {
 
     /**
      * 新增草稿
-     * 
+     *
      * @param bo
      */
     @Transactional(rollbackFor = Exception.class)
