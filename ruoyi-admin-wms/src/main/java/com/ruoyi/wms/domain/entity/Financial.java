@@ -45,7 +45,7 @@ public class Financial extends BaseEntity {
     /**
      * 金额
      */
-    private String amount;
+    private BigDecimal amount;
     /**
      * 状态变更事件
      */

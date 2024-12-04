@@ -3,7 +3,7 @@ package com.ruoyi.wms.mapper;
 import com.ruoyi.common.mybatis.annotation.DataColumn;
 import com.ruoyi.common.mybatis.annotation.DataPermission;
 import com.ruoyi.wms.domain.entity.Financial;
-import com.ruoyi.wms.domain.vo.FinancialVo;
+import com.ruoyi.wms.domain.vo.financial.FinancialVo;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 
 /**

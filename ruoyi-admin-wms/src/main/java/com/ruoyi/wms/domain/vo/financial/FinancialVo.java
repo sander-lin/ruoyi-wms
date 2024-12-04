@@ -1,10 +1,8 @@
-package com.ruoyi.wms.domain.vo;
+package com.ruoyi.wms.domain.vo.financial;
 
 import com.ruoyi.wms.domain.entity.Financial;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
 import com.ruoyi.common.mybatis.core.domain.BaseVo;
 
 import lombok.Data;
@@ -27,7 +25,7 @@ public class FinancialVo extends BaseVo {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String id;

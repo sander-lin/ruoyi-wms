@@ -2,6 +2,7 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
+import com.ruoyi.wms.domain.vo.financial.FinancialTableInfoVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
@@ -14,7 +15,7 @@ import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.vo.FinancialVo;
+import com.ruoyi.wms.domain.vo.financial.FinancialVo;
 import com.ruoyi.wms.domain.bo.financial.FinancialBo;
 import com.ruoyi.wms.service.FinancialService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
@@ -38,7 +39,7 @@ public class FinancialController extends BaseController {
      */
     @SaCheckPermission("wms:financial:list")
     @GetMapping("/list")
-    public TableDataInfo<FinancialVo> list(FinancialBo bo, PageQuery pageQuery) {
+    public FinancialTableInfoVo list(FinancialBo bo, PageQuery pageQuery) {
         return financialService.queryPageList(bo, pageQuery);
     }
 

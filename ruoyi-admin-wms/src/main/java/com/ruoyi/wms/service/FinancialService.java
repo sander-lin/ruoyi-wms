@@ -7,13 +7,17 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.wms.domain.vo.financial.FinancialTableInfoVo;
+import com.ruoyi.wms.enums.FinancialState;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.financial.FinancialBo;
-import com.ruoyi.wms.domain.vo.FinancialVo;
+import com.ruoyi.wms.domain.vo.financial.FinancialVo;
 import com.ruoyi.wms.domain.entity.Financial;
 import com.ruoyi.wms.mapper.FinancialMapper;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -40,10 +44,32 @@ public class FinancialService {
     /**
      * 查询资金明细表列表
      */
-    public TableDataInfo<FinancialVo> queryPageList(FinancialBo bo, PageQuery pageQuery) {
+    public FinancialTableInfoVo queryPageList(FinancialBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<Financial> lqw = buildQueryWrapper(bo);
         Page<FinancialVo> result = financialMapper.selectVoPage(pageQuery.build(), lqw);
-        return TableDataInfo.build(result);
+
+        FinancialTableInfoVo financialTableInfoVo = new FinancialTableInfoVo();
+        BeanUtils.copyProperties(TableDataInfo.build(result), financialTableInfoVo);
+
+        lqw.select(Financial::getAmount,Financial::getState);
+
+        financialMapper.selectMaps(lqw, resultContext -> {
+            Map<String,Object> res = resultContext.getResultObject();
+            if(res.get("state").toString().equals(FinancialState.INCOME.getCode())) {
+                BigDecimal income = new BigDecimal(financialTableInfoVo.getTotalIncome());
+                income = income.add((BigDecimal) res.get("amount"));
+                financialTableInfoVo.setTotalIncome(income.toString());
+
+            }
+            if(res.get("state").toString().equals(FinancialState.EXPENDITURE.getCode())) {
+                BigDecimal expenditure = new BigDecimal(financialTableInfoVo.getTotalExpenditure());
+                expenditure = expenditure.add((BigDecimal) res.get("amount"));
+                financialTableInfoVo.setTotalExpenditure(expenditure.toString());
+            }
+        });
+
+
+        return financialTableInfoVo;
     }
 
     /**
@@ -62,10 +88,10 @@ public class FinancialService {
         lqw.eq(StringUtils.isNotBlank(bo.getAmount()), Financial::getAmount, bo.getAmount());
         lqw.eq(StringUtils.isNotBlank(bo.getEvent()), Financial::getEvent, bo.getEvent());
         lqw.eq(Financial::getIsDelete, false);
-        lqw.orderByDesc(Financial::getCreateTime);
-        lqw.eq(Financial::getIsDelete, false);
         lqw.ge(StringUtils.isNotBlank(bo.getStartTime()), Financial::getCreateTime, bo.getStartTime());
         lqw.le(StringUtils.isNotBlank(bo.getEndTime()), Financial::getCreateTime, bo.getEndTime());
+        lqw.orderByDesc(Financial::getCreateTime);
+
         return lqw;
     }
 
