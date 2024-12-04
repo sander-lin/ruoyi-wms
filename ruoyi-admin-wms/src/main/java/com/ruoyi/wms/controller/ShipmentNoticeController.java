@@ -129,18 +129,6 @@ public class ShipmentNoticeController extends BaseController {
     }
 
     /**
-     * 修改发货请求通知单
-     */
-    @SaCheckPermission("wms:shipmentNotice:edit")
-    @Log(title = "发货请求通知单", businessType = BusinessType.UPDATE)
-    @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody ShipmentNoticeBo bo) {
-        shipmentNoticeService.updateByBo(bo);
-        return R.ok();
-    }
-
-    /**
      * 删除发货请求通知单
      *
      * @param ids 主键串

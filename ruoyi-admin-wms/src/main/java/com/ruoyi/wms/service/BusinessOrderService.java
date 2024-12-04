@@ -31,6 +31,7 @@ import com.ruoyi.wms.mapper.BusinessOrderMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 订单表Service业务层处理
@@ -163,15 +164,40 @@ public class BusinessOrderService {
     /**
      * 修改订单状态
      */
+    @Transactional(rollbackFor = Exception.class)
     public void publish(NewOrderBo bo) {
         String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
         bo.setUserId(userId);
 
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
 
+        businessOrderMapper.updateById(businessOrder);
+
         checkAndUpdateUserBalance(businessOrder);
 
-        businessOrderMapper.updateById(businessOrder);
+        handleMerchandise(bo);
+    }
+
+    private void handleMerchandise(NewOrderBo bo) {
+        LambdaQueryWrapper<OrderMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.eq(OrderMerchandise::getOrderId, bo.getId());
+        List<OrderMerchandiseVo> orderMerchandiseVos = orderMerchandiseMapper.selectVoList(lqw);
+
+        Map<String,String> existingMerchandiseIds = orderMerchandiseVos.stream()
+            .collect(Collectors.toMap(OrderMerchandiseVo::getMerchandiseId,OrderMerchandiseVo::getId));
+
+        bo.getMerchandises().forEach(merchandise -> {
+            merchandise.setOrderId(bo.getId());
+            if(StringUtils.isNotBlank(existingMerchandiseIds.get(merchandise.getMerchandiseId()))) {
+                merchandise.setId(existingMerchandiseIds.get(merchandise.getMerchandiseId()));
+                orderMerchandiseMapper.updateById(MapstructUtils.convert(merchandise, OrderMerchandise.class));
+                existingMerchandiseIds.remove(merchandise.getMerchandiseId());
+            } else {
+                orderMerchandiseMapper.insert(MapstructUtils.convert(merchandise, OrderMerchandise.class));
+            }
+        });
+
+        orderMerchandiseMapper.deleteBatchIds(existingMerchandiseIds.values());
     }
 
     /**
@@ -182,7 +208,9 @@ public class BusinessOrderService {
         if(businessOrderVo == null) throw new RuntimeException("该订单不存在！");
         if(businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())) throw new RuntimeException("不能修改为草稿状态!");
         BusinessOrder update = MapstructUtils.convert(bo, BusinessOrder.class);
+
         businessOrderMapper.updateById(update);
+
     }
 
     /**

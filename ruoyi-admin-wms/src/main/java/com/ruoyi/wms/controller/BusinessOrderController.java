@@ -106,18 +106,6 @@ public class BusinessOrderController extends BaseController {
     }
 
     /**
-     * 修改订单表
-     */
-    @SaCheckPermission("wms:order:edit")
-    @Log(title = "订单表", businessType = BusinessType.UPDATE)
-    @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
-        orderService.updateByBo(bo);
-        return R.ok();
-    }
-
-    /**
      * 修改订单状态
      */
     @SaCheckPermission("wms:order:edit")

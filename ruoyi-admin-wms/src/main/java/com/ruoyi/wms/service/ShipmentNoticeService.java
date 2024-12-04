@@ -29,6 +29,7 @@ import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 发货请求通知单Service业务层处理
@@ -105,7 +106,6 @@ public class ShipmentNoticeService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewShipmentNoticeBo bo) {
-        bo.setStatus(ShipmentNoticeStatus.PENDING.getCode());
         ShipmentNotice add = MapstructUtils.convert(bo, ShipmentNotice.class);
         shipmentNoticeMapper.insert(add);
 
@@ -142,46 +142,43 @@ public class ShipmentNoticeService {
         shipmentNoticeMapper.updateById(MapstructUtils.convert(bo, ShipmentNotice.class));
     }
 
+    @Transactional(rollbackFor = Exception.class)
     public void publish(NewShipmentNoticeBo bo) {
         ShipmentNoticeVo shipmentNoticeVo = shipmentNoticeMapper.selectVoById(bo.getId());
 
         if(!shipmentNoticeVo.getStatus().equals(ShipmentNoticeStatus.DRAFT.getCode())) throw new RuntimeException("当前状态无法发布！");
+        shipmentNoticeMapper.updateById(MapstructUtils.convert(bo, ShipmentNotice.class));
 
+        handleMerchandise(bo);
+    }
+
+    private void handleMerchandise(NewShipmentNoticeBo bo) {
         List<OrderMerchandiseVo> orderMerchandises = getOrderMerchandiseVos(bo);
-        List<ShipmentNoticeMerchandiseVo> noticeMerchandise = selectNoticeMerchandiseByOrderId(bo.getOrderId());
+        List<ShipmentNoticeMerchandiseVo> noticeMerchandises = selectNoticeMerchandiseByOrderId(bo.getOrderId());
+
+        Map<String,String> existingMerchandiseIds = noticeMerchandises.stream()
+            .collect(Collectors.toMap(ShipmentNoticeMerchandiseVo::getMerchandiseId,ShipmentNoticeMerchandiseVo::getId));
 
         bo.getMerchandises().forEach(merchandise -> {
             if(!checkMerchandiseInOrder(merchandise))
                 throw new RuntimeException(merchandise.getMerchandiseId() + " 订单不存在该商品！");
 
-            checkQuantityNotice(merchandise, orderMerchandises, noticeMerchandise);
-
-            ShipmentNoticeMerchandiseVo shipmentNoticeMerchandiseVo = getShipmentNoticeMerchandiseVo(bo, merchandise);
-            boolean isExisting = shipmentNoticeMerchandiseVo != null;
-            if(isExisting) {
-                ShipmentNoticeMerchandise update = MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class);
-                update.setId(shipmentNoticeMerchandiseVo.getId());
-                shipmentNoticeMerchandiseMapper.updateById(update);
-            } else{
+            checkQuantityNotice(merchandise, orderMerchandises, noticeMerchandises);
+            if(StringUtils.isNotBlank(existingMerchandiseIds.get(merchandise.getMerchandiseId()))) {
+                merchandise.setId(existingMerchandiseIds.get(merchandise.getMerchandiseId()));
+                shipmentNoticeMerchandiseMapper.updateById(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
+                existingMerchandiseIds.remove(merchandise.getMerchandiseId());
+            } else {
                 shipmentNoticeMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
             }
         });
-
-        shipmentNoticeMapper.updateById(MapstructUtils.convert(bo, ShipmentNotice.class));
+        shipmentNoticeMerchandiseMapper.deleteBatchIds(existingMerchandiseIds.values());
     }
-
-    private ShipmentNoticeMerchandiseVo getShipmentNoticeMerchandiseVo(NewShipmentNoticeBo bo, ShipmentNoticeMerchandiseBo merchandise) {
-        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
-        lqw.eq(ShipmentNoticeMerchandise::getMerchandiseId, merchandise.getMerchandiseId());
-        lqw.eq(ShipmentNoticeMerchandise::getShipmentNoticeId, bo.getId());
-        return shipmentNoticeMerchandiseMapper.selectVoOne(lqw);
-    }
-
 
     private void checkQuantityNotice(
         ShipmentNoticeMerchandiseBo merchandise,
         List<OrderMerchandiseVo> orderMerchandises,
-        List<ShipmentNoticeMerchandiseVo> noticeMerchandise
+        List<ShipmentNoticeMerchandiseVo> noticeMerchandises
     ) {
         OrderMerchandiseVo initialVo = new OrderMerchandiseVo();
         initialVo.setQuantityRequired("0");
@@ -192,7 +189,7 @@ public class ShipmentNoticeService {
             .orElse(initialVo)
             .getQuantityRequired());
 
-        int compareQuantityNoticed = noticeMerchandise.stream()
+        int compareQuantityNoticed = noticeMerchandises.stream()
             .filter(e -> e.getMerchandiseId().equals(merchandise.getMerchandiseId()))
             .mapToInt(e-> Integer.parseInt(e.getQuantityNotice()))
             .sum();
