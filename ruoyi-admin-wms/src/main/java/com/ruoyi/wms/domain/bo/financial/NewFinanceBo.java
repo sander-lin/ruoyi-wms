@@ -6,6 +6,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import com.ruoyi.wms.enums.FinancialState;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -31,17 +32,19 @@ public class NewFinanceBo extends BaseEntity {
     /**
      * 金额
      */
-    @NotNull(message = "金额不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "金额不能为空", groups = { AddGroup.class, EditGroup.class })
     private String amount;
 
     /**
      * 支出 1 收入 0
      */
+    @Null
     private String state;
 
     /**
      * 事件
      */
+    @Null
     private String event;
 
 

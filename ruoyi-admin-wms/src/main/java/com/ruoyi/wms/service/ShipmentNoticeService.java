@@ -23,7 +23,7 @@ import com.ruoyi.wms.mapper.ShipmentMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
+import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeBo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import org.springframework.transaction.annotation.Transactional;
@@ -138,8 +138,45 @@ public class ShipmentNoticeService {
     }
 
     public void UpdateStatus(UpdateShipmentNoticeStatusBo bo) {
+        if(bo.getStatus().equals(ShipmentNoticeStatus.DRAFT.getCode())) throw new RuntimeException("不能修改为草稿状态!");
         shipmentNoticeMapper.updateById(MapstructUtils.convert(bo, ShipmentNotice.class));
     }
+
+    public void publish(NewShipmentNoticeBo bo) {
+        ShipmentNoticeVo shipmentNoticeVo = shipmentNoticeMapper.selectVoById(bo.getId());
+
+        if(!shipmentNoticeVo.getStatus().equals(ShipmentNoticeStatus.DRAFT.getCode())) throw new RuntimeException("当前状态无法发布！");
+
+        List<OrderMerchandiseVo> orderMerchandises = getOrderMerchandiseVos(bo);
+        List<ShipmentNoticeMerchandiseVo> noticeMerchandise = selectNoticeMerchandiseByOrderId(bo.getOrderId());
+
+        bo.getMerchandises().forEach(merchandise -> {
+            if(!checkMerchandiseInOrder(merchandise))
+                throw new RuntimeException(merchandise.getMerchandiseId() + " 订单不存在该商品！");
+
+            checkQuantityNotice(merchandise, orderMerchandises, noticeMerchandise);
+
+            ShipmentNoticeMerchandiseVo shipmentNoticeMerchandiseVo = getShipmentNoticeMerchandiseVo(bo, merchandise);
+            boolean isExisting = shipmentNoticeMerchandiseVo != null;
+            if(isExisting) {
+                ShipmentNoticeMerchandise update = MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class);
+                update.setId(shipmentNoticeMerchandiseVo.getId());
+                shipmentNoticeMerchandiseMapper.updateById(update);
+            } else{
+                shipmentNoticeMerchandiseMapper.insert(MapstructUtils.convert(merchandise, ShipmentNoticeMerchandise.class));
+            }
+        });
+
+        shipmentNoticeMapper.updateById(MapstructUtils.convert(bo, ShipmentNotice.class));
+    }
+
+    private ShipmentNoticeMerchandiseVo getShipmentNoticeMerchandiseVo(NewShipmentNoticeBo bo, ShipmentNoticeMerchandiseBo merchandise) {
+        LambdaQueryWrapper<ShipmentNoticeMerchandise> lqw = Wrappers.lambdaQuery();
+        lqw.eq(ShipmentNoticeMerchandise::getMerchandiseId, merchandise.getMerchandiseId());
+        lqw.eq(ShipmentNoticeMerchandise::getShipmentNoticeId, bo.getId());
+        return shipmentNoticeMerchandiseMapper.selectVoOne(lqw);
+    }
+
 
     private void checkQuantityNotice(
         ShipmentNoticeMerchandiseBo merchandise,

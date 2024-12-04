@@ -5,6 +5,7 @@
  import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
  import io.github.linpeilie.annotations.AutoMapper;
  import jakarta.validation.constraints.NotBlank;
+ import jakarta.validation.constraints.Null;
  import lombok.Data;
  import lombok.EqualsAndHashCode;
 
@@ -30,6 +31,7 @@
      /**
       * 订单id
       */
+     @Null
      private String orderId;
 
      /**
@@ -41,6 +43,7 @@
      /**
       * 请求通知单id
       */
+     @Null
      private String shipmentNoticeId;
 
      /**

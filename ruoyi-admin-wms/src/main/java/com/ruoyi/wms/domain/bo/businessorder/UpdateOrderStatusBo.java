@@ -9,7 +9,6 @@
  import lombok.Data;
  import lombok.EqualsAndHashCode;
 
- import java.math.BigDecimal;
  import java.util.List;
 
 
@@ -21,7 +20,7 @@
  @Data
  @EqualsAndHashCode(callSuper = true)
  @AutoMapper(target = BusinessOrder.class, reverseConvertGenerate = false)
- public class UpdateOrderBo extends BaseEntity {
+ public class UpdateOrderStatusBo extends BaseEntity {
 
      /**
       *
@@ -30,18 +29,8 @@
      private String id;
 
      /**
-      * 订单类型
+      * 订单状态
       */
-     @NotBlank(message = "订单类型不能为空", groups = { AddGroup.class, EditGroup.class })
-     private String type;
-
-     /**
-      * 备注
-      */
-     private String remark;
-
-     @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
-     private String totalAmount;
-
-     private List<BusinessOrderMerchandiseBo> merchandises;
+     @NotBlank(message = "订单状态不能为空", groups = { EditGroup.class })
+     private String status;
  }

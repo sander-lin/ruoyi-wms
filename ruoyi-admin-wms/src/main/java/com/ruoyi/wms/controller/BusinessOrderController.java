@@ -4,9 +4,10 @@ import java.util.List;
 
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
-import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderStatusBo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
+import com.ruoyi.wms.enums.OrderStatus;
 import com.ruoyi.wms.service.BusinessOrderService;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -111,10 +112,36 @@ public class BusinessOrderController extends BaseController {
     @Log(title = "订单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody UpdateOrderBo bo) {
+    public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
         orderService.updateByBo(bo);
         return R.ok();
     }
+
+    /**
+     * 修改订单状态
+     */
+    @SaCheckPermission("wms:order:edit")
+    @Log(title = "订单表", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/status")
+    public R<Void> editStatus(@Validated(EditGroup.class) @RequestBody UpdateOrderStatusBo bo) {
+        orderService.updateStatus(bo);
+        return R.ok();
+    }
+
+    /**
+     * 发布订单草稿
+     */
+    @SaCheckPermission("wms:order:edit")
+    @Log(title = "订单表", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/publish")
+    public R<Void> publish(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
+        orderService.publish(bo);
+        return R.ok();
+    }
+
+
 
     /**
      * 删除订单表

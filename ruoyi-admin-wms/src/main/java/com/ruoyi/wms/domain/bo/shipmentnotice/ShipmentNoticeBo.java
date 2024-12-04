@@ -1,4 +1,4 @@
-package com.ruoyi.wms.domain.bo;
+package com.ruoyi.wms.domain.bo.shipmentnotice;
 
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.common.core.validate.AddGroup;

@@ -21,7 +21,7 @@ import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
-import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
+import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeBo;
 import com.ruoyi.wms.service.ShipmentNoticeService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
@@ -113,6 +113,18 @@ public class ShipmentNoticeController extends BaseController {
     @PutMapping("/status")
     public R<Void> editStatus(@Validated(EditGroup.class) @RequestBody UpdateShipmentNoticeStatusBo bo) {
         shipmentNoticeService.UpdateStatus(bo);
+        return R.ok();
+    }
+
+    /**
+     * 发布草稿通知单
+     */
+    @SaCheckPermission("wms:shipmentNotice:edit")
+    @Log(title = "发货请求通知单", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/publish/{id}")
+    public R<Void> publish(@Validated(EditGroup.class) @PathVariable NewShipmentNoticeBo bo) {
+        shipmentNoticeService.publish(bo);
         return R.ok();
     }
 

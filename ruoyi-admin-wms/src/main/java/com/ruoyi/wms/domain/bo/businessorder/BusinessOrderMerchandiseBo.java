@@ -30,6 +30,7 @@
      /**
       * 订单id
       */
+     @Null
      private String orderId;
 
      /**

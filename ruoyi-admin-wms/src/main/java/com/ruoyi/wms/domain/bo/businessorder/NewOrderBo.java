@@ -7,6 +7,8 @@
  import com.ruoyi.wms.enums.OrderStatus;
  import io.github.linpeilie.annotations.AutoMapper;
  import jakarta.validation.constraints.NotBlank;
+ import jakarta.validation.constraints.NotNull;
+ import jakarta.validation.constraints.Null;
  import lombok.Data;
  import lombok.EqualsAndHashCode;
 
@@ -33,6 +35,7 @@
      /**
       * 所属客户
       */
+     @Null
      private String userId;
 
      /**
@@ -44,8 +47,8 @@
      /**
       * 订单状态
       */
-     @NotBlank(message = "订单状态不能为空", groups = { EditGroup.class })
-     private String status = OrderStatus.DRAFT.getCode();
+     @Null
+     private String status;
 
      /**
       * 备注
@@ -55,5 +58,6 @@
      @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
      private String totalAmount;
 
+     @NotNull(message = "商品不能为空", groups = { AddGroup.class, EditGroup.class })
      private List<BusinessOrderMerchandiseBo> merchandises;
  }

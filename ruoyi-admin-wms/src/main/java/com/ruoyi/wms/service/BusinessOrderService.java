@@ -2,7 +2,6 @@ package com.ruoyi.wms.service;
 
 import cn.dev33.satoken.stp.StpUtil;
 import com.ruoyi.common.core.utils.MapstructUtils;
-import com.ruoyi.common.core.utils.SpringUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -12,7 +11,7 @@ import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
-import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderStatusBo;
 import com.ruoyi.wms.domain.bo.financial.NewFinanceBo;
 import com.ruoyi.wms.domain.entity.BusinessOrder;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
@@ -154,17 +153,23 @@ public class BusinessOrderService {
     }
 
     /**
+     * 修改订单表
+     */
+    public void updateByBo(NewOrderBo bo) {
+        BusinessOrder update = MapstructUtils.convert(bo, BusinessOrder.class);
+        businessOrderMapper.updateById(update);
+    }
+
+    /**
      * 修改订单状态
      */
-    public void updateStatus(NewOrderBo bo) {
+    public void publish(NewOrderBo bo) {
         String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
         bo.setUserId(userId);
-        BusinessOrderVo businessOrderVo = queryById(bo.getId());
 
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
-        if (businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())) {
-            checkAndUpdateUserBalance(businessOrder);
-        }
+
+        checkAndUpdateUserBalance(businessOrder);
 
         businessOrderMapper.updateById(businessOrder);
     }
@@ -172,7 +177,10 @@ public class BusinessOrderService {
     /**
      * 修改订单表
      */
-    public void updateByBo(UpdateOrderBo bo) {
+    public void updateStatus(UpdateOrderStatusBo bo) {
+        BusinessOrderVo businessOrderVo = queryById(bo.getId());
+        if(businessOrderVo == null) throw new RuntimeException("该订单不存在！");
+        if(businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())) throw new RuntimeException("不能修改为草稿状态!");
         BusinessOrder update = MapstructUtils.convert(bo, BusinessOrder.class);
         businessOrderMapper.updateById(update);
     }

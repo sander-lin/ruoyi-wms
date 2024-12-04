@@ -7,6 +7,7 @@ import com.ruoyi.wms.domain.entity.UserBalance;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -33,12 +34,13 @@ public class NewUserBalanceBo extends BaseEntity {
     /**
      * 充值金额
      */
-    @NotNull(message = "充值金额不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "充值金额不能为空", groups = { AddGroup.class, EditGroup.class })
     private String amount;
 
     /**
      * 事件
      */
+    @Null
     private String event;
 
 }
