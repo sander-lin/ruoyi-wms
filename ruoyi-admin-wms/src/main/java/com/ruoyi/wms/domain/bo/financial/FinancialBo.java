@@ -60,7 +60,4 @@ public class FinancialBo extends BaseEntity {
     @NotBlank(message = "上次金额不能为空", groups = { AddGroup.class, EditGroup.class })
     private String lastBalance;
 
-    private String startTime;
-
-    private String endTime;
 }

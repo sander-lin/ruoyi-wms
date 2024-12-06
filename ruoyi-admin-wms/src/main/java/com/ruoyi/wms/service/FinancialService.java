@@ -51,23 +51,22 @@ public class FinancialService {
         FinancialTableInfoVo financialTableInfoVo = new FinancialTableInfoVo();
         BeanUtils.copyProperties(TableDataInfo.build(result), financialTableInfoVo);
 
-        lqw.select(Financial::getAmount,Financial::getState);
+        lqw.select(Financial::getAmount, Financial::getState);
 
         financialMapper.selectMaps(lqw, resultContext -> {
-            Map<String,Object> res = resultContext.getResultObject();
-            if(res.get("state").toString().equals(FinancialState.INCOME.getCode())) {
+            Map<String, Object> res = resultContext.getResultObject();
+            if (res.get("state").toString().equals(FinancialState.INCOME.getCode())) {
                 BigDecimal income = new BigDecimal(financialTableInfoVo.getTotalIncome());
                 income = income.add((BigDecimal) res.get("amount"));
                 financialTableInfoVo.setTotalIncome(income.toString());
 
             }
-            if(res.get("state").toString().equals(FinancialState.EXPENDITURE.getCode())) {
+            if (res.get("state").toString().equals(FinancialState.EXPENDITURE.getCode())) {
                 BigDecimal expenditure = new BigDecimal(financialTableInfoVo.getTotalExpenditure());
                 expenditure = expenditure.add((BigDecimal) res.get("amount"));
                 financialTableInfoVo.setTotalExpenditure(expenditure.toString());
             }
         });
-
 
         return financialTableInfoVo;
     }
@@ -88,8 +87,8 @@ public class FinancialService {
         lqw.eq(StringUtils.isNotBlank(bo.getAmount()), Financial::getAmount, bo.getAmount());
         lqw.eq(StringUtils.isNotBlank(bo.getEvent()), Financial::getEvent, bo.getEvent());
         lqw.eq(Financial::getIsDelete, false);
-        lqw.ge(StringUtils.isNotBlank(bo.getStartTime()), Financial::getCreateTime, bo.getStartTime());
-        lqw.le(StringUtils.isNotBlank(bo.getEndTime()), Financial::getCreateTime, bo.getEndTime());
+        lqw.between(params.get("beginTime") != null && params.get("endTime") != null, Financial::getCreateTime,
+                params.get("beginTime"), params.get("endTime"));
         lqw.orderByDesc(Financial::getCreateTime);
 
         return lqw;

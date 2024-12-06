@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import com.ruoyi.wms.mapper.BusinessOrderMapper;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -126,12 +127,29 @@ public class BusinessOrderService {
         });
     }
 
+    /**
+     * 付款
+     */
     private void checkAndUpdateUserBalance(@NotNull BusinessOrder bo) {
         NewFinanceBo newFinanceBo = new NewFinanceBo();
         newFinanceBo.setUserId(bo.getUserId());
         newFinanceBo.setState(FinancialState.EXPENDITURE.getCode());
         newFinanceBo.setEvent("订单支出： " + bo.getId());
         newFinanceBo.setAmount(bo.getTotalAmount().toString());
+        userBalanceService.updateByBo(newFinanceBo);
+    }
+
+    /**
+     * 退款
+     */
+    private void refundForOrder(@NotNull BusinessOrder bo) {
+        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+        String totalAmount = businessOrderMapper.selectVoById(bo.getId()).getTotalAmount().toString();
+        NewFinanceBo newFinanceBo = new NewFinanceBo();
+        newFinanceBo.setUserId(userId);
+        newFinanceBo.setState(FinancialState.INCOME.getCode());
+        newFinanceBo.setEvent("订单退款： " + bo.getId());
+        newFinanceBo.setAmount(totalAmount);
         userBalanceService.updateByBo(newFinanceBo);
     }
 
@@ -183,12 +201,12 @@ public class BusinessOrderService {
         lqw.eq(OrderMerchandise::getOrderId, bo.getId());
         List<OrderMerchandiseVo> orderMerchandiseVos = orderMerchandiseMapper.selectVoList(lqw);
 
-        Map<String,String> existingMerchandiseIds = orderMerchandiseVos.stream()
-            .collect(Collectors.toMap(OrderMerchandiseVo::getMerchandiseId,OrderMerchandiseVo::getId));
+        Map<String, String> existingMerchandiseIds = orderMerchandiseVos.stream()
+                .collect(Collectors.toMap(OrderMerchandiseVo::getMerchandiseId, OrderMerchandiseVo::getId));
 
         bo.getMerchandises().forEach(merchandise -> {
             merchandise.setOrderId(bo.getId());
-            if(StringUtils.isNotBlank(existingMerchandiseIds.get(merchandise.getMerchandiseId()))) {
+            if (StringUtils.isNotBlank(existingMerchandiseIds.get(merchandise.getMerchandiseId()))) {
                 merchandise.setId(existingMerchandiseIds.get(merchandise.getMerchandiseId()));
                 orderMerchandiseMapper.updateById(MapstructUtils.convert(merchandise, OrderMerchandise.class));
                 existingMerchandiseIds.remove(merchandise.getMerchandiseId());
@@ -205,8 +223,10 @@ public class BusinessOrderService {
      */
     public void updateStatus(UpdateOrderStatusBo bo) {
         BusinessOrderVo businessOrderVo = queryById(bo.getId());
-        if(businessOrderVo == null) throw new RuntimeException("该订单不存在！");
-        if(businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode())) throw new RuntimeException("不能修改为草稿状态!");
+        if (businessOrderVo == null)
+            throw new RuntimeException("该订单不存在！");
+        if (businessOrderVo.getStatus().equals(OrderStatus.DRAFT.getCode()))
+            throw new RuntimeException("不能修改为草稿状态!");
         BusinessOrder update = MapstructUtils.convert(bo, BusinessOrder.class);
 
         businessOrderMapper.updateById(update);
@@ -214,7 +234,7 @@ public class BusinessOrderService {
     }
 
     /**
-     * 批量删除订单表
+     * 删除订单表
      */
     @Transactional(rollbackFor = Exception.class)
     public void deleteByIds(Collection<String> ids) {
@@ -234,6 +254,7 @@ public class BusinessOrderService {
             businessOrder.setIsDelete(true);
             businessOrder.setId(id);
             businessOrders.add(businessOrder);
+            refundForOrder(businessOrder);
         });
 
         List<String> shipmentNoticeIds = getShipmentNoticeIdByOrderIds(ids);

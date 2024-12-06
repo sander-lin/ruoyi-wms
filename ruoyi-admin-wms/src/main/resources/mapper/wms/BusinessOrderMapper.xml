@@ -31,10 +31,25 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.quantity_required,
             m.*,
             m.id as m_id,
-            om.label_option
+            om.label_option,
+            sqn.total_quantity_notice
         from order_merchandise om
         inner join merchandise m on m.id = om.merchandise_id
-        where om.order_id = #{id} and om.is_delete = 0
+        left join (
+            select
+                SUM(snm.quantity_notice) total_quantity_notice,
+                snm.merchandise_id
+            FROM (
+                SELECT
+                    id
+                FROM shipment_notice
+                WHERE order_id = #{id} and is_delete = 0 and status != 1
+            ) sn
+            inner JOIN shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
+            where snm.is_delete = 0
+            GROUP BY snm.merchandise_id
+        ) sqn on sqn.merchandise_id = m.id
+        where om.order_id = #{id} and om.is_delete = 0 
     </select>
 
     <select id="selectMerchandiseListByOrderId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo">
