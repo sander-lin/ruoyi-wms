@@ -7,6 +7,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 
 import java.io.Serial;
+import java.math.BigDecimal;
 
 /**
  * 资金明细表对象 financial
@@ -44,10 +45,14 @@ public class Financial extends BaseEntity {
     /**
      * 金额
      */
-    private String amount;
+    private BigDecimal amount;
     /**
      * 状态变更事件
      */
     private String event;
+    /**
+     * 最近上次变更金额
+     */
+    private BigDecimal lastBalance;
 
 }

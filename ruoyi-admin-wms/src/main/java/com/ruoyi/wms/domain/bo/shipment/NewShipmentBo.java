@@ -6,6 +6,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import com.ruoyi.wms.domain.entity.Shipment;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -51,7 +52,6 @@ public class NewShipmentBo extends BaseEntity {
     /**
      * 备注
      */
-    @NotBlank(message = "备注不能为空", groups = { AddGroup.class, EditGroup.class })
     private String remark;
 
     /**
@@ -59,5 +59,6 @@ public class NewShipmentBo extends BaseEntity {
      */
     private String logisticsNumber;
 
+    @NotNull(message = "商品不能为空", groups = { AddGroup.class, EditGroup.class })
     private List<ShipmentMerchandiseBo> merchandises;
 }

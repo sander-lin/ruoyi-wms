@@ -2,11 +2,12 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
-import cn.dev33.satoken.annotation.SaIgnore;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderStatusBo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
+import com.ruoyi.wms.enums.OrderStatus;
 import com.ruoyi.wms.service.BusinessOrderService;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -49,6 +50,15 @@ public class BusinessOrderController extends BaseController {
     }
 
     /**
+     * 查询草稿订单表列表
+     */
+    @SaCheckPermission("wms:order:draftList")
+    @GetMapping("/list/draft")
+    public TableDataInfo<BusinessOrderVo> draftLists(BusinessOrderBo bo, PageQuery pageQuery) {
+        return orderService.queryDraftOrderList(bo, pageQuery);
+    }
+
+    /**
      * 获取订单表详细信息
      *
      * @param id 主键
@@ -84,16 +94,42 @@ public class BusinessOrderController extends BaseController {
     }
 
     /**
-     * 修改订单表
+     * 新增草稿订单表
+     */
+    @SaCheckPermission("wms:order:addDraft")
+    @Log(title = "订单表", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping("/draft")
+    public R<Void> addDraft(@Validated(AddGroup.class) @RequestBody NewOrderBo bo) {
+        orderService.insertByDraftBo(bo);
+        return R.ok();
+    }
+
+    /**
+     * 修改订单状态
      */
     @SaCheckPermission("wms:order:edit")
     @Log(title = "订单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
-        orderService.updateByBo(bo);
+    @PutMapping("/status")
+    public R<Void> editStatus(@Validated(EditGroup.class) @RequestBody UpdateOrderStatusBo bo) {
+        orderService.updateStatus(bo);
         return R.ok();
     }
+
+    /**
+     * 发布订单草稿
+     */
+    @SaCheckPermission("wms:order:edit")
+    @Log(title = "订单表", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/publish")
+    public R<Void> publish(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
+        orderService.publish(bo);
+        return R.ok();
+    }
+
+
 
     /**
      * 删除订单表

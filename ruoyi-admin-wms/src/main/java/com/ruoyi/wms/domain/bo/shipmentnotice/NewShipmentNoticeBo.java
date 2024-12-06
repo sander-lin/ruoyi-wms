@@ -6,6 +6,8 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import io.github.linpeilie.annotations.AutoMapper;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -51,7 +53,7 @@ public class NewShipmentNoticeBo extends BaseEntity {
     /**
      * 通知单状态
      */
-    @NotBlank(message = "通知单状态不能为空", groups = { AddGroup.class, EditGroup.class })
+    @Null
     private String status;
 
     /**
@@ -65,5 +67,6 @@ public class NewShipmentNoticeBo extends BaseEntity {
      */
     private String remark;
 
+    @NotNull(message = "商品不能为空", groups = { AddGroup.class, EditGroup.class })
     private List<ShipmentNoticeMerchandiseBo> merchandises;
 }

@@ -1,6 +1,8 @@
 package com.ruoyi.wms.service;
 
 import com.ruoyi.common.core.utils.MapstructUtils;
+import com.ruoyi.common.mybatis.annotation.DataColumn;
+import com.ruoyi.common.mybatis.annotation.DataPermission;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.utils.StringUtils;
@@ -8,21 +10,16 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
-import com.ruoyi.wms.domain.entity.ShipmentMerchandise;
-import com.ruoyi.wms.domain.entity.ShipmentNoticeMerchandise;
 import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
-import com.ruoyi.wms.mapper.ShipmentMerchandiseMapper;
-import com.ruoyi.wms.mapper.ShipmentNoticeMerchandiseMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.MerchandiseBo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.mapper.MerchandiseMapper;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -70,6 +67,9 @@ public class MerchandiseService {
     /**
      * 查询商品管理列表
      */
+    @DataPermission({
+        @DataColumn(value = "user_id")
+    })
     public TableDataInfo<MerchandiseVo> queryPageList(MerchandiseBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<Merchandise> lqw = buildQueryWrapper(bo);
         Page<MerchandiseVo> result = merchandiseMapper.selectVoPage(pageQuery.build(), lqw);

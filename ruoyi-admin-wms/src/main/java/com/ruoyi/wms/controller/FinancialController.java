@@ -2,23 +2,21 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
+import com.ruoyi.wms.domain.vo.financial.FinancialTableInfoVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
-import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
 import com.ruoyi.common.log.annotation.Log;
 import com.ruoyi.common.web.core.BaseController;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
 import com.ruoyi.common.core.domain.R;
-import com.ruoyi.common.core.validate.AddGroup;
-import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
-import com.ruoyi.wms.domain.vo.FinancialVo;
-import com.ruoyi.wms.domain.bo.FinancialBo;
+import com.ruoyi.wms.domain.vo.financial.FinancialVo;
+import com.ruoyi.wms.domain.bo.financial.FinancialBo;
 import com.ruoyi.wms.service.FinancialService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
@@ -41,7 +39,7 @@ public class FinancialController extends BaseController {
      */
     @SaCheckPermission("wms:financial:list")
     @GetMapping("/list")
-    public TableDataInfo<FinancialVo> list(FinancialBo bo, PageQuery pageQuery) {
+    public FinancialTableInfoVo list(FinancialBo bo, PageQuery pageQuery) {
         return financialService.queryPageList(bo, pageQuery);
     }
 
@@ -66,30 +64,6 @@ public class FinancialController extends BaseController {
     public R<FinancialVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable String id) {
         return R.ok(financialService.queryById(id));
-    }
-
-    /**
-     * 新增资金明细表
-     */
-    @SaCheckPermission("wms:financial:add")
-    @Log(title = "资金明细表", businessType = BusinessType.INSERT)
-    @RepeatSubmit()
-    @PostMapping()
-    public R<Void> add(@Validated(AddGroup.class) @RequestBody FinancialBo bo) {
-        financialService.insertByBo(bo);
-        return R.ok();
-    }
-
-    /**
-     * 修改资金明细表
-     */
-    @SaCheckPermission("wms:financial:edit")
-    @Log(title = "资金明细表", businessType = BusinessType.UPDATE)
-    @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody FinancialBo bo) {
-        financialService.updateByBo(bo);
-        return R.ok();
     }
 
     /**

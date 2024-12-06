@@ -1,14 +1,16 @@
-package com.ruoyi.wms.domain.bo;
+package com.ruoyi.wms.domain.bo.financial;
 
 import com.ruoyi.wms.domain.entity.Financial;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
+import com.ruoyi.wms.enums.FinancialState;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import io.github.linpeilie.annotations.AutoMapper;
 
+import java.math.BigDecimal;
 
 /**
  * 资金明细表业务对象 financial
@@ -23,7 +25,7 @@ import io.github.linpeilie.annotations.AutoMapper;
 public class FinancialBo extends BaseEntity {
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "不能为空", groups = { EditGroup.class })
     private String id;
@@ -52,5 +54,10 @@ public class FinancialBo extends BaseEntity {
     @NotBlank(message = "状态变更事件不能为空", groups = { AddGroup.class, EditGroup.class })
     private String event;
 
+    /**
+     * 上次金额
+     */
+    @NotBlank(message = "上次金额不能为空", groups = { AddGroup.class, EditGroup.class })
+    private String lastBalance;
 
 }

@@ -27,9 +27,12 @@
      @Serial
      private static final long serialVersionUID = 1L;
 
+     private String id;
+
      /**
       * 订单id
       */
+     @Null
      private String orderId;
 
      /**

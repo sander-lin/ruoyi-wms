@@ -1,14 +1,13 @@
-package com.ruoyi.wms.domain.vo;
+package com.ruoyi.wms.domain.vo.financial;
 
 import com.ruoyi.wms.domain.entity.Financial;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
-import com.ruoyi.common.excel.annotation.ExcelDictFormat;
-import com.ruoyi.common.excel.convert.ExcelDictConvert;
+import com.ruoyi.common.mybatis.core.domain.BaseVo;
+
 import lombok.Data;
 import io.github.linpeilie.annotations.AutoMapper;
 
-import java.io.Serializable;
 import java.io.Serial;
 
 /**
@@ -20,13 +19,13 @@ import java.io.Serial;
 @Data
 @ExcelIgnoreUnannotated
 @AutoMapper(target = Financial.class)
-public class FinancialVo implements Serializable {
+public class FinancialVo extends BaseVo {
 
     @Serial
     private static final long serialVersionUID = 1L;
 
     /**
-     * 
+     *
      */
     @ExcelProperty(value = "")
     private String id;

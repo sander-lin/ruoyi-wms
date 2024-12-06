@@ -3,6 +3,7 @@ package com.ruoyi.wms.controller;
 import java.util.List;
 
 import com.ruoyi.wms.domain.bo.shipmentnotice.NewShipmentNoticeBo;
+import com.ruoyi.wms.domain.bo.shipmentnotice.UpdateShipmentNoticeStatusBo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
@@ -20,7 +21,7 @@ import com.ruoyi.common.core.validate.EditGroup;
 import com.ruoyi.common.log.enums.BusinessType;
 import com.ruoyi.common.excel.utils.ExcelUtil;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
-import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
+import com.ruoyi.wms.domain.bo.shipmentnotice.ShipmentNoticeBo;
 import com.ruoyi.wms.service.ShipmentNoticeService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 
@@ -44,8 +45,16 @@ public class ShipmentNoticeController extends BaseController {
     @SaCheckPermission("wms:shipmentNotice:list")
     @GetMapping("/list")
     public TableDataInfo<ShipmentNoticeVo> list(ShipmentNoticeBo bo, PageQuery pageQuery) {
-//        return shipmentNoticeService.queryPageList(bo, pageQuery);
         return shipmentNoticeService.queryShipmentNoticeList(bo, pageQuery);
+    }
+
+    /**
+     * 查询发货请求通知单列表
+     */
+    @SaCheckPermission("wms:shipmentNotice:draftList")
+    @GetMapping("/list/draft")
+    public TableDataInfo<ShipmentNoticeVo> draftList(ShipmentNoticeBo bo, PageQuery pageQuery) {
+        return shipmentNoticeService.queryShipmentNoticeDraftList(bo, pageQuery);
     }
 
     /**
@@ -79,19 +88,43 @@ public class ShipmentNoticeController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody NewShipmentNoticeBo bo) {
-        shipmentNoticeService.insertByBo(bo);
+        shipmentNoticeService.insertNoticeByBo(bo);
         return R.ok();
     }
 
     /**
-     * 修改发货请求通知单
+     * 新增草稿发货请求通知单
+     */
+    @SaCheckPermission("wms:shipmentNotice:addDraft")
+    @Log(title = "发货请求通知单草稿", businessType = BusinessType.INSERT)
+    @RepeatSubmit()
+    @PostMapping("/draft")
+    public R<Void> addDraft(@Validated(AddGroup.class) @RequestBody NewShipmentNoticeBo bo) {
+        shipmentNoticeService.insertNoticeDraftByBo(bo);
+        return R.ok();
+    }
+
+    /**
+     * 修改发货请求通知单状态
      */
     @SaCheckPermission("wms:shipmentNotice:edit")
     @Log(title = "发货请求通知单", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
-    @PutMapping()
-    public R<Void> edit(@Validated(EditGroup.class) @RequestBody ShipmentNoticeBo bo) {
-        shipmentNoticeService.updateByBo(bo);
+    @PutMapping("/status")
+    public R<Void> editStatus(@Validated(EditGroup.class) @RequestBody UpdateShipmentNoticeStatusBo bo) {
+        shipmentNoticeService.UpdateStatus(bo);
+        return R.ok();
+    }
+
+    /**
+     * 发布草稿通知单
+     */
+    @SaCheckPermission("wms:shipmentNotice:edit")
+    @Log(title = "发货请求通知单", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/publish/{id}")
+    public R<Void> publish(@Validated(EditGroup.class) @PathVariable NewShipmentNoticeBo bo) {
+        shipmentNoticeService.publish(bo);
         return R.ok();
     }
 

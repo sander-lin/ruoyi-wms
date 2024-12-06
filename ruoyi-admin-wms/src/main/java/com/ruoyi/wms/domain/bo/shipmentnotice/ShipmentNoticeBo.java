@@ -1,4 +1,4 @@
-package com.ruoyi.wms.domain.bo;
+package com.ruoyi.wms.domain.bo.shipmentnotice;
 
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.common.core.validate.AddGroup;
@@ -23,19 +23,19 @@ import io.github.linpeilie.annotations.AutoMapper;
 public class ShipmentNoticeBo extends BaseEntity {
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "不能为空", groups = { EditGroup.class })
     private String id;
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private String orderId;
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "不能为空", groups = { AddGroup.class, EditGroup.class })
     private String userId;
@@ -61,7 +61,6 @@ public class ShipmentNoticeBo extends BaseEntity {
     /**
      * 备注
      */
-    @NotBlank(message = "备注不能为空", groups = { AddGroup.class, EditGroup.class })
     private String remark;
 
 

@@ -5,7 +5,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
-
 import java.io.Serial;
 
 /**
@@ -20,7 +19,7 @@ import java.io.Serial;
 public class Shipment extends BaseEntity {
 
     @Serial
-    private static final long serialVersionUID=1L;
+    private static final long serialVersionUID = 1L;
 
     /**
      *

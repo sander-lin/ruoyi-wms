@@ -21,7 +21,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-@AutoMapper(target = SysDept.class, reverseConvertGenerate = false)
+@AutoMapper(target = SysDept.class, reverseConvertGenerate = true)
 public class SysDeptBo extends BaseEntity {
 
     /**

@@ -4,11 +4,15 @@
  import com.ruoyi.common.core.validate.EditGroup;
  import com.ruoyi.common.mybatis.core.domain.BaseEntity;
  import com.ruoyi.wms.domain.entity.BusinessOrder;
+ import com.ruoyi.wms.enums.OrderStatus;
  import io.github.linpeilie.annotations.AutoMapper;
  import jakarta.validation.constraints.NotBlank;
+ import jakarta.validation.constraints.NotNull;
+ import jakarta.validation.constraints.Null;
  import lombok.Data;
  import lombok.EqualsAndHashCode;
 
+ import java.math.BigDecimal;
  import java.util.List;
 
 
@@ -31,7 +35,7 @@
      /**
       * 所属客户
       */
-     @NotBlank(message = "所属客户不能为空", groups = { AddGroup.class, EditGroup.class })
+     @Null
      private String userId;
 
      /**
@@ -43,17 +47,17 @@
      /**
       * 订单状态
       */
-     @NotBlank(message = "订单状态不能为空", groups = { AddGroup.class, EditGroup.class })
+     @Null
      private String status;
 
      /**
       * 备注
       */
-     @NotBlank(message = "备注不能为空", groups = { AddGroup.class, EditGroup.class })
      private String remark;
 
      @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
      private String totalAmount;
 
+     @NotNull(message = "商品不能为空", groups = { AddGroup.class, EditGroup.class })
      private List<BusinessOrderMerchandiseBo> merchandises;
  }

@@ -1,11 +1,10 @@
 package com.ruoyi.wms.mapper;
 
 import com.baomidou.mybatisplus.core.conditions.Wrapper;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ruoyi.system.domain.entity.SysPost;
-import com.ruoyi.wms.domain.bo.ShipmentNoticeBo;
+import com.ruoyi.common.mybatis.annotation.DataColumn;
+import com.ruoyi.common.mybatis.annotation.DataPermission;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
@@ -18,6 +17,9 @@ import org.apache.ibatis.annotations.Param;
  * @author huiwei
  * @date 2024-11-18
  */
+@DataPermission({
+    @DataColumn(key = "userName", value = "user_id")
+})
 public interface ShipmentNoticeMapper extends BaseMapperPlus<ShipmentNotice, ShipmentNoticeVo> {
     Page<ShipmentNoticeVo> selectShipmentNoticeVoList(Page<ShipmentNoticeVo> page, @Param(Constants.WRAPPER) Wrapper<ShipmentNotice> queryWrapper);
     ShipmentNoticeDetailVo selectShipmentNoticeById(@Param("id") long id);

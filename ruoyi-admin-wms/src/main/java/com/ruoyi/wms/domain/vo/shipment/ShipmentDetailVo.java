@@ -58,6 +58,12 @@ public class ShipmentDetailVo extends BaseVo {
     private String remark;
 
     /**
+     * 标签种类
+     */
+    @ExcelProperty(value = "标签种类")
+    private String tag;
+
+    /**
      * 物流单号
      */
     @ExcelProperty(value = "物流单号")
