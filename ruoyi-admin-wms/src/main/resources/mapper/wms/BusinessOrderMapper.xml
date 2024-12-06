@@ -110,7 +110,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         from (
             select id,order_id
             from shipment_notice
-            where id = #{id} and is_delete = 0 and status != 1
+            where id = #{id} and is_delete = 0
         ) sn
         inner join shipment_notice_merchandise snm on snm.shipment_notice_id = sn.id
         inner join order_merchandise om on om.order_id = sn.order_id AND om.merchandise_id = snm.merchandise_id
@@ -136,7 +136,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             *,
             id shipment_notice_id
         from shipment_notice
-        where order_id = #{id} and is_delete = 0
+        <where>
+            order_id = #{id} and is_delete = 0 and status != 1
+        </where>
     </select>
 
 </mapper>
