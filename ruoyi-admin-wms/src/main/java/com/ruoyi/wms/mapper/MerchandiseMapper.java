@@ -21,6 +21,12 @@ import org.apache.ibatis.annotations.Param;
     @DataColumn(key = "userName", value = "user_id")
 })
 public interface MerchandiseMapper extends BaseMapperPlus<Merchandise, MerchandiseVo> {
+    @DataPermission({
+        @DataColumn(key = "userName", value = "m.user_id")
+    })
     Page<MerchandiseShipmentCreatingVo> selectShipmentMerchandiseByShipmentNoticeId(Page<MerchandiseShipmentCreatingVo> page, @Param("id") long id);
+    @DataPermission({
+        @DataColumn(key = "userName", value = "m.user_id")
+    })
     Page<MerchandiseNoticeCreatingVo> selectNoticeMerchandiseByOrderId(Page<MerchandiseNoticeCreatingVo> page, @Param("id") long id);
 }
