@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wms.mapper.ShipmentNoticeMapper">
+    <resultMap id="ShipmentNoticeResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo">
+        <id property="id" column="id" />
+        <collection property="merchandises" column="id" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo"
+                    select="selectShipmentNoticeMerchandise"/>
+    </resultMap>
+
+    <resultMap id="ShipmentNoticeDetailResMap" type="com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo">
+        <id property="id" column="id" />
+        <collection property="merchandises" column="{orderId = order_id, id = id}" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo"
+                    select="selectShipmentNoticeDetailMerchandise"/>
+        <collection property="shipments" column="id" ofType="com.ruoyi.wms.domain.vo.shipment.ShipmentVo"
+                    select="selectShipmentList"/>
+    </resultMap>
+
+
+
+    <select id="selectShipmentNoticeVoList" resultMap="ShipmentNoticeResMap">
+        select
+            *
+        from shipment_notice ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="selectShipmentNoticeMerchandise" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeVo">
+        select
+            m.*,
+            snm.quantity_notice
+        from shipment_notice_merchandise snm
+        inner join merchandise m on m.id = snm.merchandise_id
+        where snm.shipment_notice_id = #{id} and snm.is_delete = 0
+    </select>
+
+    <select id="selectShipmentNoticeById" resultMap="ShipmentNoticeDetailResMap">
+        select *
+        from shipment_notice
+        where id = #{id} and is_delete = 0
+    </select>
+
+    <select id="selectShipmentNoticeDetailMerchandise" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo">
+        select distinct
+            m.*,
+            om.label_option,
+            om.quantity_required,
+            snm.quantity_notice,
+            sqs.total_quantity_shipped
+        from shipment_notice_merchandise snm
+        inner join merchandise m on m.id = snm.merchandise_id
+        inner join order_merchandise om on om.order_id = #{orderId} and om.merchandise_id = snm.merchandise_id
+        left join (
+            select
+                sm2.merchandise_id,
+                sum(sm2.quantity_shipped) total_quantity_shipped
+            from
+            (
+                select
+                    id
+                from shipment_notice
+                where id = #{id} and is_delete = 0 and status != 1
+            ) sn2
+            inner join shipment s2 on s2.shipment_notice_id = sn2.id
+            inner join shipment_merchandise sm2 on sm2.shipment_id = s2.id
+            where sm2.is_delete = 0
+            group by sm2.merchandise_id
+        ) sqs on sqs.merchandise_id = m.id
+        where snm.shipment_notice_id = #{id} and snm.is_delete = 0
+    </select>
+
+    <select id="selectShipmentList" resultType="com.ruoyi.wms.domain.vo.shipment.ShipmentVo">
+        select distinct
+            s.*
+        from (
+            select
+                *
+            from shipment
+            where shipment_notice_id = #{id} and is_delete = 0
+        ) s
+        inner join shipment_merchandise sm on sm.shipment_id = s.id
+    </select>
+</mapper>

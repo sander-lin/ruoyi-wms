@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wms.mapper.ShipmentMapper">
+
+    <resultMap id="ShipmentResMap" type="com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo">
+        <id property="id"  column="id"/>
+        <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentDetailVo"
+                    column="{id=id,shipmentNoticeId = shipment_notice_id}" select="selectShipmentList"/>
+    </resultMap>
+
+    <select id="selectShipmentList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentDetailVo">
+        select DISTINCT
+            m.*,
+            sqs.total_quantity_shipped,
+            sm.quantity_shipped,
+            om.label_option,
+            snm.quantity_notice
+        from shipment_notice sn
+        inner join shipment s on s.shipment_notice_id = sn.id
+        inner join shipment_merchandise sm on sm.shipment_id = s.id
+        inner join merchandise m on m.id = sm.merchandise_id
+        inner join (
+            select
+                sm2.merchandise_id,
+                sum(sm2.quantity_shipped) total_quantity_shipped
+            from shipment_notice sn2
+            inner join shipment s2 on s2.shipment_notice_id = sn2.id
+            inner join shipment_merchandise sm2 on sm2.shipment_id = s2.id
+            where sm2.is_delete = 0 and sn2.status != 1
+            group by sm2.merchandise_id
+        ) sqs on sqs.merchandise_id = m.id
+        inner join shipment_notice_merchandise snm on snm.merchandise_id = m.id and snm.shipment_notice_id = sn.id
+        inner join order_merchandise om on om.merchandise_id = m.id and om.order_id = sn.order_id
+        where sn.id = #{shipmentNoticeId} and s.id = #{id} and sn.is_delete = 0
+    </select>
+
+    <select id="selectShipmentById" resultMap="ShipmentResMap">
+        select
+            s.*,
+            sn.tag
+        from shipment s
+        inner join shipment_notice sn on sn.id = s.shipment_notice_id
+        where s.id = #{id} and s.is_delete = 0
+    </select>
+</mapper>

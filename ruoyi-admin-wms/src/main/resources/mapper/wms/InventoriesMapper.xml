@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.wms.mapper.InventoriesMapper">
+    <resultMap id="inventoriesVoMap" type="com.ruoyi.wms.domain.vo.InventoriesVo">
+
+        <association property="merchandise" javaType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo" >
+            <id property="id" column="mer_id" />
+        </association>
+    </resultMap>
+
+    <select id="queryInventoryIncludeMerchandiseList" resultMap="inventoriesVoMap">
+        select
+        inventory.*,
+        merchandise.*,
+        merchandise.id as mer_id
+        from inventory
+        inner join merchandise on inventory.merchandise_id=merchandise.id
+    </select>
+    <insert id="batchInsert">
+        INSERT INTO inventory (id, number, merchandise_id, unit, remark)
+        VALUES
+        <foreach collection="inventories" item="inventory" separator=",">
+            (#{inventory.id}, #{inventory.number}, #{inventory.merchandiseId}, #{inventory.unit}, #{inventory.remark})
+        </foreach>
+    </insert>
+    <select id="selectByMerchandiseId" resultType="com.ruoyi.wms.domain.entity.Inventories">
+        SELECT * FROM inventory WHERE merchandise_id = #{merchandiseId}
+    </select>
+
+    <update id="updateInventoryById">
+        UPDATE inventory
+        SET number = #{number}, unit = #{unit}, remark = #{remark}
+        WHERE id = #{id}
+    </update>
+</mapper>

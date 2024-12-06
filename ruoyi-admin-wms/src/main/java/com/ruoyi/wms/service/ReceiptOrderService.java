@@ -45,16 +45,14 @@ public class ReceiptOrderService {
 
     private final ReceiptOrderMapper receiptOrderMapper;
     private final ReceiptOrderDetailService receiptOrderDetailService;
-    private final ReceiptOrderDetailMapper receiptOrderDetailMapper;
     private final InventoryService inventoryService;
     private final InventoryDetailService inventoryDetailService;
     private final InventoryHistoryService inventoryHistoryService;
-    private final SysDictTypeService dictTypeService;
 
     /**
      * 查询入库单
      */
-    public ReceiptOrderVo queryById(Long id){
+    public ReceiptOrderVo queryById(Long id) {
         ReceiptOrderVo receiptOrderVo = receiptOrderMapper.selectVoById(id);
         Assert.notNull(receiptOrderVo, "入库单不存在");
         receiptOrderVo.setDetails(receiptOrderDetailService.queryByReceiptOrderId(id));
@@ -148,7 +146,7 @@ public class ReceiptOrderService {
         }
     }
 
-    private void saveInventoryHistory(ReceiptOrderBo bo){
+    private void saveInventoryHistory(ReceiptOrderBo bo) {
         List<InventoryHistory> inventoryHistoryList = new LinkedList<>();
         bo.getDetails().forEach(detail -> {
             InventoryHistory inventoryHistory = new InventoryHistory();
@@ -168,7 +166,7 @@ public class ReceiptOrderService {
         inventoryHistoryService.saveBatch(inventoryHistoryList);
     }
 
-    private void saveInventoryDetails(ReceiptOrderBo bo){
+    private void saveInventoryDetails(ReceiptOrderBo bo) {
 
         List<InventoryDetail> inventoryDetailList = MapstructUtils.convert(bo.getDetails(), InventoryDetail.class);
 
@@ -183,11 +181,13 @@ public class ReceiptOrderService {
 
     /**
      * 合并入库单详情 合并key：warehouseId_areaId_skuId
+     * 
      * @param orderDetailBoList
      * @return
      */
     private List<InventoryBo> convertInventoryList(List<ReceiptOrderDetailBo> orderDetailBoList) {
-        Function<ReceiptOrderDetailBo, String> keyFunction = it -> it.getWarehouseId() + "_" + it.getAreaId() + "_" + it.getSkuId();
+        Function<ReceiptOrderDetailBo, String> keyFunction = it -> it.getWarehouseId() + "_" + it.getAreaId() + "_"
+                + it.getSkuId();
         Map<String, InventoryBo> inventoryMap = new HashMap<>();
         orderDetailBoList.forEach(orderDetailBo -> {
             String key = keyFunction.apply(orderDetailBo);
@@ -222,6 +222,7 @@ public class ReceiptOrderService {
 
     /**
      * 入库单作废
+     * 
      * @param id
      */
     public void editToInvalid(Long id) {
@@ -243,7 +244,8 @@ public class ReceiptOrderService {
         ReceiptOrderVo receiptOrderVo = queryById(id);
         Assert.notNull(receiptOrderVo, "入库单不存在");
         if (ServiceConstants.ReceiptOrderStatus.FINISH.equals(receiptOrderVo.getReceiptOrderStatus())) {
-            throw new ServiceException("入库单【" + receiptOrderVo.getReceiptOrderNo() + "】已入库，无法删除！", HttpStatus.CONFLICT.value());
+            throw new ServiceException("入库单【" + receiptOrderVo.getReceiptOrderNo() + "】已入库，无法删除！",
+                    HttpStatus.CONFLICT.value());
         }
     }
 

@@ -6,6 +6,7 @@ import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.entity.ShipmentOrder;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
 import java.math.BigDecimal;
@@ -19,6 +20,7 @@ import java.util.List;
  */
 @Data
 @ExcelIgnoreUnannotated
+@EqualsAndHashCode(callSuper = true)
 @AutoMapper(target = ShipmentOrder.class)
 public class ShipmentOrderVo extends BaseVo{
 
