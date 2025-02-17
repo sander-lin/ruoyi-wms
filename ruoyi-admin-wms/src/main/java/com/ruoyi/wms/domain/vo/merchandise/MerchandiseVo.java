@@ -9,6 +9,7 @@ import io.github.linpeilie.annotations.AutoMapper;
 
 import java.io.Serializable;
 import java.io.Serial;
+import java.util.List;
 
 /**
  * 商品管理视图对象 merchandise
@@ -71,6 +72,12 @@ public class MerchandiseVo implements Serializable {
      */
     @ExcelProperty(value = "图片")
     private String image;
+
+    /**
+     * 上传文件地址
+     */
+    @ExcelProperty(value = "文件列表")
+    private List<File> files;
 
     /**
      * 所属用户

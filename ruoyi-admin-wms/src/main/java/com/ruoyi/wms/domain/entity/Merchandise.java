@@ -68,4 +68,8 @@ public class Merchandise extends BaseEntity {
      * 是否删除
      */
     private Boolean isDelete;
+    /**
+     * 待确认
+     */
+    private Boolean isConfirmed;
 }

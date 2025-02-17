@@ -1,5 +1,6 @@
 package com.ruoyi.wms.service;
 
+import cn.hutool.core.util.ObjectUtil;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.mybatis.annotation.DataColumn;
 import com.ruoyi.common.mybatis.annotation.DataPermission;
@@ -9,8 +10,13 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.system.domain.vo.SysOssVo;
+import com.ruoyi.system.service.SysOssService;
+import com.ruoyi.wms.domain.bo.MerchandiseOssBo;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
+import com.ruoyi.wms.domain.vo.MerchandiseOssVo;
 import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
+import com.ruoyi.wms.domain.vo.merchandise.File;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
@@ -20,6 +26,8 @@ import com.ruoyi.wms.domain.bo.MerchandiseBo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.mapper.MerchandiseMapper;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,12 +46,28 @@ public class MerchandiseService {
 
     private final MerchandiseMapper merchandiseMapper;
     private final OrderMerchandiseMapper orderMerchandiseMapper;
+    private final MerchandiseOssService merchandiseOssService;
+    private final SysOssService sysOssService;
 
     /**
      * 查询商品管理
      */
     public MerchandiseVo queryById(String id) {
-        return merchandiseMapper.selectVoById(id);
+        MerchandiseVo merchandiseVo = merchandiseMapper.selectVoById(id);
+
+        MerchandiseOssBo merchandiseOssBo = new MerchandiseOssBo();
+        merchandiseOssBo.setMerchandiseId(merchandiseVo.getId());
+        List<MerchandiseOssVo> merchandiseOssVos = merchandiseOssService.queryList(merchandiseOssBo);
+
+        List<SysOssVo> sysOssVos = sysOssService.listByIds(merchandiseOssVos.stream().map(e-> Long.parseLong(e.getOssId())).toList());
+        merchandiseVo.setFiles(sysOssVos.stream().map(e -> {
+            File file = new File();
+            file.setName(e.getOriginalName());
+            file.setUrl(e.getUrl());
+            return file;
+        }).toList());
+
+        return merchandiseVo;
     }
 
     /**
@@ -95,6 +119,7 @@ public class MerchandiseService {
         lqw.eq(StringUtils.isNotBlank(bo.getType()), Merchandise::getType, bo.getType());
         lqw.eq(StringUtils.isNotBlank(bo.getImage()), Merchandise::getImage, bo.getImage());
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), Merchandise::getUserId, bo.getUserId());
+        lqw.eq(bo.getIsConfirmed() != null, Merchandise::getIsConfirmed, bo.getIsConfirmed());
         lqw.eq(bo.getPrice() != null, Merchandise::getPrice, bo.getPrice());
         lqw.eq(Merchandise::getIsDelete,false);
         return lqw;
@@ -103,9 +128,21 @@ public class MerchandiseService {
     /**
      * 新增商品管理
      */
+    @Transactional(rollbackFor = Exception.class)
     public void insertByBo(MerchandiseBo bo) {
+
         Merchandise add = MapstructUtils.convert(bo, Merchandise.class);
+        add.setIsConfirmed(false);
         merchandiseMapper.insert(add);
+
+        if(StringUtils.isNotEmpty(bo.getFileIds())) {
+            for(String ossId:bo.getFileIds().split(",")) {
+                MerchandiseOssBo merchandiseOssBo = new MerchandiseOssBo();
+                merchandiseOssBo.setMerchandiseId(add.getId());
+                merchandiseOssBo.setOssId(ossId);
+                merchandiseOssService.insertByBo(merchandiseOssBo);
+            }
+        }
     }
 
     /**
@@ -113,6 +150,16 @@ public class MerchandiseService {
      */
     public void updateByBo(MerchandiseBo bo) {
         Merchandise update = MapstructUtils.convert(bo, Merchandise.class);
+        merchandiseMapper.updateById(update);
+    }
+
+    /**
+     * 确认商品
+     */
+    public void confirmById(String id){
+        Merchandise update = new Merchandise();
+        update.setId(id);
+        update.setIsConfirmed(true);
         merchandiseMapper.updateById(update);
     }
 
