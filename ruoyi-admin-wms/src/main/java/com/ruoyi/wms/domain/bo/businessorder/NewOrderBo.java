@@ -1,5 +1,6 @@
  package com.ruoyi.wms.domain.bo.businessorder;
 
+ import com.fasterxml.jackson.annotation.JsonIgnore;
  import com.ruoyi.common.core.validate.AddGroup;
  import com.ruoyi.common.core.validate.EditGroup;
  import com.ruoyi.common.mybatis.core.domain.BaseEntity;
@@ -47,7 +48,7 @@
      /**
       * 订单状态
       */
-     @Null
+     @JsonIgnore
      private String status;
 
      /**
@@ -55,9 +56,21 @@
       */
      private String remark;
 
+     /**
+      * 备注
+      */
+     @JsonIgnore
+     private Boolean isConfirmed;
+
+     /**
+      * 订单总额
+      */
      @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
      private String totalAmount;
 
+     /**
+      * 关联商品
+      */
      @NotNull(message = "商品不能为空", groups = { AddGroup.class, EditGroup.class })
      private List<BusinessOrderMerchandiseBo> merchandises;
  }

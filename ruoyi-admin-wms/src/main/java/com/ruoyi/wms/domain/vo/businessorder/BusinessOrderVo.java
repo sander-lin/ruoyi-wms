@@ -59,5 +59,6 @@
      @ExcelProperty(value = "备注")
      private String remark;
 
+     @ExcelProperty(value = "商品")
      private List<MerchandiseOrderVo> merchandises;
  }

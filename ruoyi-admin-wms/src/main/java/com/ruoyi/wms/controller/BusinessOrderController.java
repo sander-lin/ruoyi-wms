@@ -1,12 +1,16 @@
 package com.ruoyi.wms.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import com.jdcloud.sdk.annotation.BodyParameter;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderStatusBo;
+import com.ruoyi.wms.domain.excel.OrderExcel;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.enums.OrderStatus;
 import com.ruoyi.wms.service.BusinessOrderService;
 import lombok.RequiredArgsConstructor;
@@ -75,9 +79,34 @@ public class BusinessOrderController extends BaseController {
     @SaCheckPermission("wms:order:export")
     @Log(title = "订单表", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
-    public void export(BusinessOrderBo bo, HttpServletResponse response) {
-        List<BusinessOrderVo> list = orderService.queryList(bo);
-        ExcelUtil.exportExcel(list, "订单表", BusinessOrderVo.class, response);
+    public void export(@RequestBody List<String> ids, HttpServletResponse response) {
+        List<BusinessOrderVo> list = orderService.queryByIds(ids);
+        List<OrderExcel> OrderExcels = new ArrayList<>();
+
+        for (BusinessOrderVo order : list) {
+            if(order.getMerchandises() != null) {
+                for (MerchandiseVo m : order.getMerchandises()) {
+                    OrderExcel dto = new OrderExcel();
+                    dto.setId(order.getId());
+                    dto.setType(order.getType());
+                    dto.setAsin(m.getAsin());
+                    dto.setImage(m.getImage());
+                    dto.setFnsku(m.getFnsku());
+                    dto.setColor(m.getColor());
+                    dto.setName(m.getName());
+                    dto.setPrice(m.getPrice());
+                    dto.setSize(m.getSize());
+                    dto.setMId(m.getId());
+                    dto.setRemark(order.getRemark());
+                    dto.setMType(m.getType());
+                    dto.setTotalAmount(order.getTotalAmount());
+                    dto.setStatus(order.getStatus());
+                    dto.setUserId(order.getUserId());
+                    OrderExcels.add(dto);
+                }
+            }
+        }
+        ExcelUtil.exportExcel(OrderExcels, "订单表", OrderExcel.class,true, response);
     }
 
 
@@ -89,6 +118,7 @@ public class BusinessOrderController extends BaseController {
     @RepeatSubmit()
     @PostMapping()
     public R<Void> add(@Validated(AddGroup.class) @RequestBody NewOrderBo bo) {
+        bo.setStatus(OrderStatus.UNCONFIRMED.getCode());
         orderService.insertByBo(bo);
         return R.ok();
     }
@@ -101,14 +131,15 @@ public class BusinessOrderController extends BaseController {
     @RepeatSubmit()
     @PostMapping("/draft")
     public R<Void> addDraft(@Validated(AddGroup.class) @RequestBody NewOrderBo bo) {
-        orderService.insertByDraftBo(bo);
+        bo.setStatus(OrderStatus.DRAFT.getCode());
+        orderService.insertByBo(bo);
         return R.ok();
     }
 
     /**
      * 修改订单状态
      */
-    @SaCheckPermission("wms:order:edit")
+    @SaCheckPermission("wms:order:editStatus")
     @Log(title = "订单表", businessType = BusinessType.UPDATE)
     @RepeatSubmit()
     @PutMapping("/status")
@@ -125,6 +156,7 @@ public class BusinessOrderController extends BaseController {
     @RepeatSubmit()
     @PutMapping("/publish")
     public R<Void> publish(@Validated(EditGroup.class) @RequestBody NewOrderBo bo) {
+        bo.setStatus(OrderStatus.UNCONFIRMED.getCode());
         orderService.publish(bo);
         return R.ok();
     }

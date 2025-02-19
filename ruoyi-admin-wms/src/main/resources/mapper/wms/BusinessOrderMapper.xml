@@ -49,7 +49,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             where snm.is_delete = 0
             GROUP BY snm.merchandise_id
         ) sqn on sqn.merchandise_id = m.id
-        where om.order_id = #{id} and om.is_delete = 0 
+        where om.order_id = #{id} and om.is_delete = 0
     </select>
 
     <select id="selectMerchandiseListByOrderId" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseOrderDetailVo">
@@ -133,23 +133,54 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectOrderList" resultMap="OrderResMap">
-        select o.*, o.id as order_id
-        from business_order o
+        select *
+        from business_order
         ${ew.getCustomSqlSegment}
     </select>
 
+    <select id="queryOrderList" resultMap="OrderResMap">
+        select distinct o.*
+        from business_order o
+        inner join order_merchandise om on om.order_id = o.id
+        inner join merchandise m on m.id = om.merchandise_id
+        ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="selectVoBatchIds" resultMap="OrderResMap">
+        select distinct o.*
+        from business_order o
+        inner join order_merchandise om on om.order_id = o.id
+        inner join merchandise m on m.id = om.merchandise_id
+        <where>
+            <if test="ids != null and !ids.isEmpty()">
+                o.id IN
+                <foreach
+                    item="id"
+                    collection="ids"
+                    open="("
+                    separator=","
+                    close=")"
+                >
+                    #{id}
+                </foreach>
+            </if>
+            <if test="ids == null or ids.isEmpty()">
+                1=0
+            </if>
+        </where>
+    </select>
+
+
     <select id="selectOrderDetailById" resultMap="OrderDetailResMap" parameterType="Long">
         select
-            *,
-            id order_id
+            *
         from business_order
         where id = #{id} and is_delete = 0
     </select>
 
     <select id="selectShipmentNoticeByOrderId" resultMap="ShipmentNoticeResMap">
         select
-            *,
-            id shipment_notice_id
+            *
         from shipment_notice
         <where>
             order_id = #{id} and is_delete = 0 and status != 1

@@ -54,4 +54,9 @@ public class BusinessOrder extends BaseEntity {
      * 订单总额
      */
     private BigDecimal totalAmount;
+
+    /**
+     * 待确认
+     */
+    private Boolean isConfirmed;
 }

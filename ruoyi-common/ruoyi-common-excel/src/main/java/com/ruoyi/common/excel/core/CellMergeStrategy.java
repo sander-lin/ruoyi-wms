@@ -40,6 +40,13 @@ public class CellMergeStrategy extends AbstractMergeStrategy implements Workbook
         this.cellList = handle(list, hasTitle);
     }
 
+    public CellMergeStrategy(List<?> list, boolean hasTitle, int rowIndex) {
+        this.hasTitle = hasTitle;
+        // 行合并开始下标
+        this.rowIndex = rowIndex;
+        this.cellList = handle(list, hasTitle);
+    }
+
     @Override
     protected void merge(Sheet sheet, Cell cell, Head head, Integer relativeRowIndex) {
         //单元格写入了,遍历合并区域,如果该Cell在区域内,但非首行,则清空

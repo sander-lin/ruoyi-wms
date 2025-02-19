@@ -11,6 +11,8 @@ import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
 import com.ruoyi.common.mybatis.core.mapper.BaseMapperPlus;
 import org.apache.ibatis.annotations.Param;
 
+import java.util.List;
+
 /**
  * 订单表Mapper接口
  *
@@ -21,6 +23,13 @@ import org.apache.ibatis.annotations.Param;
     @DataColumn(key = "userName", value = "user_id")
 })
 public interface BusinessOrderMapper extends BaseMapperPlus<BusinessOrder, BusinessOrderVo> {
-    Page<BusinessOrderVo> selectOrderList(Page<BusinessOrderVo> page,@Param(Constants.WRAPPER) Wrapper<BusinessOrder> queryWrapper);
+    Page<BusinessOrderVo> selectOrderList(Page<BusinessOrderVo> page, @Param(Constants.WRAPPER) Wrapper<BusinessOrder> queryWrapper);
+
+    @DataPermission({
+        @DataColumn(key = "userName", value = "o.user_id")
+    })
+    Page<BusinessOrderVo> queryOrderList(Page<BusinessOrderVo> page, @Param(Constants.WRAPPER) Wrapper<BusinessOrder> queryWrapper);
+
+    List<BusinessOrderVo> selectVoBatchIds(@Param("ids") List<String> ids);
     BusinessOrderDetailVo selectOrderDetailById(@Param("id") Long id);
 }
