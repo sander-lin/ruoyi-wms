@@ -72,7 +72,7 @@ public class MerchandiseService {
     })
     public TableDataInfo<MerchandiseVo> queryPageList(MerchandiseBo bo, PageQuery pageQuery) {
         LambdaQueryWrapper<Merchandise> lqw = buildQueryWrapper(bo);
-        Page<MerchandiseVo> result = merchandiseMapper.selectVoPage(pageQuery.build(), lqw);
+        Page<MerchandiseVo> result = merchandiseMapper.queryMerchandiseList(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 

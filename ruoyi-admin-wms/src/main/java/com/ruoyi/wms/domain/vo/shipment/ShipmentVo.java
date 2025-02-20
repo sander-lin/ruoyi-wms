@@ -1,5 +1,6 @@
 package com.ruoyi.wms.domain.vo.shipment;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.entity.Shipment;
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
@@ -10,6 +11,7 @@ import lombok.EqualsAndHashCode;
 
 import java.io.Serializable;
 import java.io.Serial;
+import java.util.Date;
 
 /**
  * 发货管理视图对象 shipment
@@ -62,5 +64,10 @@ public class ShipmentVo extends BaseVo {
     @ExcelProperty(value = "物流单号")
     private String logisticsNumber;
 
-
+    /**
+     * 发货时间
+     */
+    @ExcelProperty(value = "发货时间")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private Date deliveryTime;
 }

@@ -67,7 +67,8 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.label_option,
             sqs.total_quantity_shipped,
             om.quantity_required,
-            sqn.total_quantity_notice
+            sqn.total_quantity_notice,
+            i.number inventory_quantity
         FROM (select
                 id
             from business_order
@@ -75,6 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ) bo
         inner join order_merchandise om on om.order_id = bo.id
         inner join merchandise m on m.id = om.merchandise_id
+        inner join inventory i on i.merchandise_id = m.id
         left join (
             select distinct
                 sm.merchandise_id,

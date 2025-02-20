@@ -1,11 +1,14 @@
 package com.ruoyi.wms.domain.entity;
 
+import com.alibaba.excel.annotation.ExcelProperty;
 import com.baomidou.mybatisplus.annotation.*;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 import java.io.Serial;
+import java.util.Date;
 
 /**
  * 发货管理对象 shipment
@@ -53,4 +56,8 @@ public class Shipment extends BaseEntity {
      */
     private String logisticsNumber;
 
+    /**
+     * 发货时间
+     */
+    private Date deliveryTime;
 }

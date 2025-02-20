@@ -36,7 +36,6 @@
      /**
       * 所属客户
       */
-     @Null
      private String userId;
 
      /**

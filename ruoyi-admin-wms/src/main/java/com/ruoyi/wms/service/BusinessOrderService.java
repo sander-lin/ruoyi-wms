@@ -133,8 +133,10 @@ public class BusinessOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewOrderBo bo) {
-        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
-        bo.setUserId(userId);
+        if(bo.getUserId() == null) {
+            String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+            bo.setUserId(userId);
+        }
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
         businessOrderMapper.insert(businessOrder);
         bo.getMerchandises().forEach(merchandise -> {

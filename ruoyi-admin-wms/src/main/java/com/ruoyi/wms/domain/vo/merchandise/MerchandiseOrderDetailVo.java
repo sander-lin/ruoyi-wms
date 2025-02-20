@@ -33,6 +33,12 @@ public class MerchandiseOrderDetailVo extends MerchandiseVo {
     private String labelOption;
 
     /**
+     * 商品库存数量
+     */
+    @ExcelProperty(value = "商品库存数量")
+    private String inventoryQuantity;
+
+    /**
      * 订单需求数量
      */
     @ExcelProperty(value = "订单需求数量")

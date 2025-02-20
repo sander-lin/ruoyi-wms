@@ -72,4 +72,13 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             group by merchandise_id
         ) sqn on sqn.merchandise_id = om.merchandise_id
     </select>
+
+    <select id="queryMerchandiseList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo">
+        select distinct
+            m.*,
+            i.number inventory_quantity
+        from merchandise m
+        inner join inventory i on i.merchandise_id = m.id
+        ${ew.getCustomSqlSegment}
+    </select>
 </mapper>

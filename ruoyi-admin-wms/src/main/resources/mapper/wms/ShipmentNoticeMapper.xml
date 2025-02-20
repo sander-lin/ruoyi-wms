@@ -35,7 +35,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectShipmentNoticeById" resultMap="ShipmentNoticeDetailResMap">
-        select *
+        select distinct *
         from shipment_notice
         where id = #{id} and is_delete = 0
     </select>
@@ -46,9 +46,11 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             om.label_option,
             om.quantity_required,
             snm.quantity_notice,
-            sqs.total_quantity_shipped
+            sqs.total_quantity_shipped,
+            i.number inventory_quantity
         from shipment_notice_merchandise snm
         inner join merchandise m on m.id = snm.merchandise_id
+        inner join inventory i on i.merchandise_id = snm.merchandise_id
         inner join order_merchandise om on om.order_id = #{orderId} and om.merchandise_id = snm.merchandise_id
         left join (
             select

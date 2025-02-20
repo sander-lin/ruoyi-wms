@@ -79,6 +79,12 @@ public class MerchandiseVo implements Serializable {
     private String userId;
 
     /**
+     * 商品库存数量
+     */
+    @ExcelProperty(value = "商品库存数量")
+    private String inventoryQuantity;
+
+    /**
      * 单价
      */
     @ExcelProperty(value = "单价")
