@@ -2,12 +2,17 @@ package com.ruoyi.wms.controller;
 
 import java.util.List;
 
+import cn.hutool.core.util.ObjectUtil;
+import com.ruoyi.common.core.exception.ServiceException;
+import com.ruoyi.system.domain.vo.SysOssVo;
+import com.ruoyi.system.service.SysOssService;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeCreatingVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentCreatingVo;
 import lombok.RequiredArgsConstructor;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.constraints.*;
 import cn.dev33.satoken.annotation.SaCheckPermission;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.validation.annotation.Validated;
 import com.ruoyi.common.idempotent.annotation.RepeatSubmit;
@@ -23,6 +28,7 @@ import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.bo.MerchandiseBo;
 import com.ruoyi.wms.service.MerchandiseService;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * 商品管理
@@ -44,6 +50,17 @@ public class MerchandiseController extends BaseController {
     @SaCheckPermission("wms:merchandise:list")
     @GetMapping("/list")
     public TableDataInfo<MerchandiseVo> list(MerchandiseBo bo, PageQuery pageQuery) {
+        bo.setIsConfirmed(true);
+        return merchandiseService.queryPageList(bo, pageQuery);
+    }
+
+    /**
+     * 查询待确认商品管理列表
+     */
+    @SaCheckPermission("wms:merchandise:list")
+    @GetMapping("/listWithNotConfirmed")
+    public TableDataInfo<MerchandiseVo> listWithNotConfirmed(MerchandiseBo bo, PageQuery pageQuery) {
+        bo.setIsConfirmed(false);
         return merchandiseService.queryPageList(bo, pageQuery);
     }
 
@@ -86,6 +103,20 @@ public class MerchandiseController extends BaseController {
     public R<MerchandiseVo> getInfo(@NotNull(message = "主键不能为空")
                                      @PathVariable String id) {
         return R.ok(merchandiseService.queryById(id));
+    }
+
+    /**
+     * 确认商品
+     *
+     * @param id 主键
+     */
+    @SaCheckPermission("wms:merchandise:confirm")
+    @Log(title = "商品管理", businessType = BusinessType.UPDATE)
+    @RepeatSubmit()
+    @PutMapping("/confirm/{id}")
+    public R<Void> confirm(@NotEmpty(message = "id不能为空") @PathVariable String id) {
+        merchandiseService.confirmById(id);
+        return R.ok();
     }
 
     /**

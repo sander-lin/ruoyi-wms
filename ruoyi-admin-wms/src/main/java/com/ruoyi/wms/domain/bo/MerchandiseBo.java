@@ -1,5 +1,6 @@
 package com.ruoyi.wms.domain.bo;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.common.core.validate.AddGroup;
 import com.ruoyi.common.core.validate.EditGroup;
@@ -8,8 +9,10 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import io.github.linpeilie.annotations.AutoMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * 商品管理业务对象 merchandise
@@ -24,7 +27,7 @@ import java.math.BigDecimal;
 public class MerchandiseBo extends BaseEntity {
 
     /**
-     * 
+     *
      */
     @NotBlank(message = "id不能为空", groups = { EditGroup.class })
     private String id;
@@ -82,5 +85,16 @@ public class MerchandiseBo extends BaseEntity {
      */
     @NotNull(message = "单价不能为空", groups = { AddGroup.class, EditGroup.class })
     private BigDecimal price;
+
+    /**
+     * 相关文件
+     */
+    private String fileIds;
+
+    /**
+     * 是否确定
+     */
+    @JsonIgnore
+    private Boolean isConfirmed;
 
 }
