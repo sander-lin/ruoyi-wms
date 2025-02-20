@@ -7,7 +7,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     <resultMap id="ShipmentResMap" type="com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo">
         <id property="id"  column="id"/>
         <collection property="merchandises" ofType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentDetailVo"
-                    column="{id=id,shipmentNoticeId = shipment_notice_id}" select="selectShipmentList"/>
+                    column="{id = id,shipmentNoticeId = shipment_notice_id}" select="selectShipmentList" />
     </resultMap>
 
     <select id="selectShipmentList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentDetailVo">
@@ -37,7 +37,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
     </select>
 
     <select id="selectShipmentById" resultMap="ShipmentResMap">
-        select
+        select distinct
             s.*,
             sn.tag
         from shipment s

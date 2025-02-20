@@ -194,7 +194,7 @@ public class ExcelUtil {
             .sheet(sheetName);
         if (merge) {
             // 合并处理器
-            builder.registerWriteHandler(new CellMergeStrategy(list, true));
+            builder.registerWriteHandler(new CellMergeStrategy(list, true, 2));
         }
         // 添加下拉框操作
         builder.registerWriteHandler(new ExcelDownHandler(options));

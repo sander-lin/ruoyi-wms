@@ -1,6 +1,7 @@
 package com.ruoyi.wms.service;
 
 import cn.dev33.satoken.stp.StpUtil;
+import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.ruoyi.common.core.utils.MapstructUtils;
 import com.ruoyi.common.mybatis.core.page.TableDataInfo;
 import com.ruoyi.common.mybatis.core.page.PageQuery;
@@ -14,6 +15,7 @@ import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderStatusBo;
 import com.ruoyi.wms.domain.bo.financial.NewFinanceBo;
 import com.ruoyi.wms.domain.entity.BusinessOrder;
+import com.ruoyi.wms.domain.entity.Merchandise;
 import com.ruoyi.wms.domain.entity.OrderMerchandise;
 import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
@@ -58,6 +60,10 @@ public class BusinessOrderService {
         return businessOrderMapper.selectVoById(id);
     }
 
+    public List<BusinessOrderVo> queryByIds(List<String> ids) {
+        return businessOrderMapper.selectVoBatchIds(ids);
+    }
+
     public BusinessOrderDetailVo queryOrderDetailById(String id) {
         return businessOrderMapper.selectOrderDetailById(Long.valueOf(id));
     }
@@ -66,25 +72,25 @@ public class BusinessOrderService {
      * 查询订单表列表
      */
     public TableDataInfo<BusinessOrderVo> queryPageList(BusinessOrderBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
+        LambdaQueryWrapper<BusinessOrder> lqw = buildLambdaQueryWrapper(bo);
         Page<BusinessOrderVo> result = businessOrderMapper.selectVoPage(pageQuery.build(), lqw);
         return TableDataInfo.build(result);
     }
 
     public TableDataInfo<BusinessOrderVo> queryOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
-        LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
-        lqw.eq(StringUtils.isNotBlank(bo.getStatus()), BusinessOrder::getStatus, bo.getStatus());
-        lqw.ne(BusinessOrder::getStatus, OrderStatus.DRAFT.getCode());
-        Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
+        QueryWrapper<BusinessOrder> qw = buildQueryWrapper(bo);
+        qw.ne("o.status", OrderStatus.DRAFT.getCode());
+
+        Page<BusinessOrderVo> result = businessOrderMapper.queryOrderList(pageQuery.build(), qw);
         return TableDataInfo.build(result);
     }
 
     public TableDataInfo<BusinessOrderVo> queryDraftOrderList(BusinessOrderBo bo, PageQuery pageQuery) {
-        String userId = StpUtil.getLoginIdAsString().split(":")[1].trim();
-        LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
-        lqw.eq(BusinessOrder::getStatus, OrderStatus.DRAFT.getCode());
-        lqw.eq(BusinessOrder::getUserId, userId);
-        Page<BusinessOrderVo> result = businessOrderMapper.selectOrderList(pageQuery.build(), lqw);
+        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+        QueryWrapper<BusinessOrder> qw = buildQueryWrapper(bo);
+        qw.eq("o.status", OrderStatus.DRAFT.getCode());
+        qw.eq("o.user_id", userId);
+        Page<BusinessOrderVo> result = businessOrderMapper.queryOrderList(pageQuery.build(), qw);
         return TableDataInfo.build(result);
     }
 
@@ -92,11 +98,27 @@ public class BusinessOrderService {
      * 查询订单表列表
      */
     public List<BusinessOrderVo> queryList(BusinessOrderBo bo) {
-        LambdaQueryWrapper<BusinessOrder> lqw = buildQueryWrapper(bo);
+        LambdaQueryWrapper<BusinessOrder> lqw = buildLambdaQueryWrapper(bo);
         return businessOrderMapper.selectVoList(lqw);
     }
 
-    private LambdaQueryWrapper<BusinessOrder> buildQueryWrapper(BusinessOrderBo bo) {
+    private QueryWrapper<BusinessOrder> buildQueryWrapper(BusinessOrderBo bo) {
+        Map<String, Object> params = bo.getParams();
+        QueryWrapper<BusinessOrder> qw = Wrappers.query();
+        qw.eq(StringUtils.isNotBlank(bo.getUserId()), "o.user_id", bo.getUserId());
+        qw.eq(StringUtils.isNotBlank(bo.getType()), "o.type", bo.getType());
+        qw.eq("o.is_delete", false);
+        qw.eq(StringUtils.isNotBlank(bo.getStatus()), "o.status", bo.getStatus());
+        qw.ge(!Objects.isNull(bo.getStartTime()), "o.create_time", bo.getStartTime());
+        qw.le(!Objects.isNull(bo.getEndTime()),"o.create_time", bo.getEndTime());
+        qw.like(StringUtils.isNotBlank(bo.getName()),"m.name", bo.getName());
+
+        qw.orderByDesc("o.update_time");
+
+        return qw;
+    }
+
+    private LambdaQueryWrapper<BusinessOrder> buildLambdaQueryWrapper(BusinessOrderBo bo) {
         Map<String, Object> params = bo.getParams();
         LambdaQueryWrapper<BusinessOrder> lqw = Wrappers.lambdaQuery();
         lqw.eq(StringUtils.isNotBlank(bo.getUserId()), BusinessOrder::getUserId, bo.getUserId());
@@ -111,16 +133,12 @@ public class BusinessOrderService {
      */
     @Transactional(rollbackFor = Exception.class)
     public void insertByBo(NewOrderBo bo) {
-        String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
-
-        bo.setUserId(userId);
+        if(bo.getUserId() == null) {
+            String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
+            bo.setUserId(userId);
+        }
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
-
-        businessOrder.setStatus(OrderStatus.PAID.getCode());
         businessOrderMapper.insert(businessOrder);
-
-        checkAndUpdateUserBalance(businessOrder);
-
         bo.getMerchandises().forEach(merchandise -> {
             merchandise.setOrderId(businessOrder.getId());
             orderMerchandiseService.insertByBo(merchandise);
@@ -190,8 +208,6 @@ public class BusinessOrderService {
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
 
         businessOrderMapper.updateById(businessOrder);
-
-        checkAndUpdateUserBalance(businessOrder);
 
         handleMerchandise(bo);
     }

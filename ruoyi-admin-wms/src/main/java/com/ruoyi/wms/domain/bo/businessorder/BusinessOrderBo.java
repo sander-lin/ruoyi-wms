@@ -10,12 +10,13 @@
  import jakarta.validation.constraints.*;
  import io.github.linpeilie.annotations.AutoMapper;
 
+ import java.time.LocalDateTime;
+ import java.util.Date;
+
 
  /**
   * 订单表业务对象 order
-  *
-  * @author zcc
-  * @date 2024-11-11
+  * 获取订单列表
   */
 
  @Data
@@ -34,6 +35,21 @@
       */
      @NotBlank(message = "所属客户不能为空", groups = { AddGroup.class, EditGroup.class })
      private String userId;
+
+     /**
+      * 商品名称
+      */
+     private String name;
+
+     /**
+      * 起始日期
+      */
+     private LocalDateTime startTime;
+
+     /**
+      * 终止日期
+      */
+     private LocalDateTime endTime;
 
      /**
       * 订单类型

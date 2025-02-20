@@ -2,14 +2,17 @@ package com.ruoyi.wms.domain.vo.shipment;
 
 import com.alibaba.excel.annotation.ExcelIgnoreUnannotated;
 import com.alibaba.excel.annotation.ExcelProperty;
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.mybatis.core.domain.BaseVo;
 import com.ruoyi.wms.domain.entity.Shipment;
+import com.ruoyi.wms.domain.vo.LogisticsVo;
 import com.ruoyi.wms.domain.vo.merchandise.MerchandiseShipmentDetailVo;
 import io.github.linpeilie.annotations.AutoMapper;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -69,6 +72,21 @@ public class ShipmentDetailVo extends BaseVo {
     @ExcelProperty(value = "物流单号")
     private String logisticsNumber;
 
-    List<MerchandiseShipmentDetailVo> merchandises;
+    /**
+     * 发货时间
+     */
+    @ExcelProperty(value = "发货时间")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private Date deliveryTime;
 
+    /**
+     * 商品信息
+     */
+    private List<MerchandiseShipmentDetailVo> merchandises;
+
+
+    /**
+     * 物流信息
+     */
+    private List<LogisticsVo> logisticsList;
 }
