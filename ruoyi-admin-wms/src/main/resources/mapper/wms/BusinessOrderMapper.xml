@@ -76,7 +76,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         ) bo
         inner join order_merchandise om on om.order_id = bo.id
         inner join merchandise m on m.id = om.merchandise_id
-        inner join inventory i on i.merchandise_id = m.id
+        left join inventory i on i.merchandise_id = m.id
         left join (
             select distinct
                 sm.merchandise_id,

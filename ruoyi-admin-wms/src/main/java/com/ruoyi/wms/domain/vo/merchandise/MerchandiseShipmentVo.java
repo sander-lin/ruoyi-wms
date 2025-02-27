@@ -28,11 +28,11 @@ public class MerchandiseShipmentVo extends MerchandiseVo {
      * 选项
      */
     @ExcelProperty(value = "选项")
-    private String labelOption;
+    private Integer labelOption;
 
     /**
      * 发货数量
      */
     @ExcelProperty(value = "发货数量")
-    private String quantityShipped;
+    private Integer quantityShipped;
 }

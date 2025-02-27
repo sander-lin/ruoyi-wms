@@ -13,6 +13,7 @@ import com.ruoyi.wms.domain.bo.shipment.ShipmentMerchandiseBo;
 import com.ruoyi.wms.domain.entity.*;
 import com.ruoyi.wms.domain.vo.ShipmentMerchandiseVo;
 import com.ruoyi.wms.domain.vo.ShipmentNoticeMerchandiseVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseNoticeDetailVo;
 import com.ruoyi.wms.domain.vo.shipment.ShipmentDetailVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeDetailVo;
 import com.ruoyi.wms.enums.ShipmentNoticeStatus;
@@ -149,9 +150,9 @@ public class ShipmentService {
             .mapToInt(e -> Integer.parseInt(e.getQuantityShipped()))
             .sum();
 
-        if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
-            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
-        }
+//        if (merchandise.getQuantityShipped() > (compareQuantityNotice - compareQuantityShipped)) {
+//            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品发货数量不能超过通知发货数量！");
+//        }
     }
 
     public List<ShipmentMerchandiseVo> selectShipmentMerchandiseByShipmentNoticeId(String id) {
@@ -174,7 +175,7 @@ public class ShipmentService {
             .selectShipmentNoticeById(Long.parseLong(bo.getShipmentNoticeId()));
 
         int shipmentNoticeSum = shipmentNotice.getMerchandises().stream()
-            .mapToInt(merchandise -> Integer.parseInt(merchandise.getQuantityNotice().trim()))
+            .mapToInt(MerchandiseNoticeDetailVo::getQuantityNotice)
             .sum();
 
         List<Long> ids = shipmentNotice.getShipments()

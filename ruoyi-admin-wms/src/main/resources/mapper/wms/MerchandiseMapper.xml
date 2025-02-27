@@ -78,7 +78,20 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
             m.*,
             i.number inventory_quantity
         from merchandise m
-        inner join inventory i on i.merchandise_id = m.id
+        left join inventory i on i.merchandise_id = m.id
+        ${ew.getCustomSqlSegment}
+    </select>
+
+    <select id="queryAddableMerchandiseList" resultType="com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo">
+        select
+            *
+        from (
+            select distinct
+            mer.*
+            from merchandise mer
+            left join inventory i on i.merchandise_id = mer.id
+            where i.merchandise_id is null
+        ) m
         ${ew.getCustomSqlSegment}
     </select>
 </mapper>

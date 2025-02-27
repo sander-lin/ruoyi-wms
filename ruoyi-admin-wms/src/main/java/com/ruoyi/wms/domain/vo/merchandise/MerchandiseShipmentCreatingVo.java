@@ -34,17 +34,17 @@ public class MerchandiseShipmentCreatingVo extends MerchandiseVo {
      * 通知发货数量
      */
     @ExcelProperty(value = "通知发货数量")
-    private String quantityNotice;
+    private Integer quantityNotice;
 
     /**
      * 发货数量
      */
     @ExcelProperty(value = "库存剩余")
-    private String stock;
+    private Integer stock;
 
     /**
      * 通知发货数量
      */
     @ExcelProperty(value = "总已发货数量(包含本次)")
-    private String totalQuantityShipped;
+    private Integer totalQuantityShipped;
 }

@@ -38,4 +38,6 @@ public interface MerchandiseMapper extends BaseMapperPlus<Merchandise, Merchandi
         @DataColumn(key = "userName", value = "m.user_id")
     })
     Page<MerchandiseVo> queryMerchandiseList(Page<MerchandiseVo> page, @Param(Constants.WRAPPER) Wrapper<Merchandise> queryWrapper);
+
+    Page<MerchandiseVo> queryAddableMerchandiseList(Page<MerchandiseVo> page, @Param(Constants.WRAPPER) Wrapper<Merchandise> queryWrapper);
 }

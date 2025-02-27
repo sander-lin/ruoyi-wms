@@ -8,6 +8,7 @@ import lombok.EqualsAndHashCode;
 import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -59,5 +60,5 @@ public class Shipment extends BaseEntity {
     /**
      * 发货时间
      */
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
 }

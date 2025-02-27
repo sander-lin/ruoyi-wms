@@ -36,6 +36,7 @@
      /**
       * 所属客户
       */
+     @NotBlank(message = "所属不能为空", groups = { AddGroup.class })
      private String userId;
 
      /**
@@ -64,7 +65,7 @@
      /**
       * 订单总额
       */
-     @NotBlank(message = "订单总额不能为空", groups = { AddGroup.class, EditGroup.class })
+     @JsonIgnore
      private String totalAmount;
 
      /**

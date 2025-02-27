@@ -7,6 +7,7 @@ import com.ruoyi.common.core.utils.StringUtils;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import com.ruoyi.wms.domain.bo.InventoriesBo;
@@ -14,7 +15,9 @@ import com.ruoyi.wms.domain.bo.BatchInventoriesBo;
 import com.ruoyi.wms.domain.vo.InventoriesVo;
 import com.ruoyi.wms.domain.entity.Inventories;
 import com.ruoyi.wms.mapper.InventoriesMapper;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Collection;
@@ -101,37 +104,38 @@ public class InventoriesService {
     /**
      * 批量入库
      */
+    @Transactional(rollbackFor = Exception.class)
     public void batchInsert(BatchInventoriesBo batchInventoriesBo) {
-        // List<Inventories> inventories = new ArrayList<>();
-        // for (InventoriesBo inventoryBo : batchInventoriesBo.getInventories()) {
-        // Inventories inventory = MapstructUtils.convert(inventoryBo,
-        // Inventories.class);
-        // inventories.add(inventory);
-        // }
-        // inventoriesMapper.batchInsert(inventories); // 调用 Mapper 批量插入
+         List<Inventories> inventories = new ArrayList<>();
+         for (InventoriesBo inventoryBo : batchInventoriesBo.getInventories()) {
+             Inventories inventory = MapstructUtils.convert(inventoryBo,
+             Inventories.class);
+             inventories.add(inventory);
+         }
+         inventoriesMapper.batchInsert(inventories); // 调用 Mapper 批量插入
 
-        for (InventoriesBo inventoryBo : batchInventoriesBo.getInventories()) {
-            // 检查数据库中是否已存在相同的 merchandiseId
-            Inventories existingInventory = inventoriesMapper.selectByMerchandiseId(inventoryBo.getMerchandiseId());
-
-            if (existingInventory != null) {
-                // 如果存在，更新数量
-                System.out.println("xxxx: " + existingInventory.getNumber() + " + " + inventoryBo.getNumber());
-                existingInventory.setNumber(existingInventory.getNumber() +
-                        Integer.valueOf(inventoryBo.getNumber()));
-                if (inventoryBo.getUnit() != null && !inventoryBo.getUnit().isEmpty()) {
-                    existingInventory.setUnit(inventoryBo.getUnit());
-                }
-                if (inventoryBo.getRemark() != null && !inventoryBo.getRemark().isEmpty()) {
-                    existingInventory.setRemark(inventoryBo.getRemark());
-                }
-                inventoriesMapper.updateInventoryById(existingInventory);
-            } else {
-                // 如果不存在，插入新纪录
-                Inventories newInventory = MapstructUtils.convert(inventoryBo,
-                        Inventories.class);
-                inventoriesMapper.insert(newInventory);
-            }
-        }
+//        for (InventoriesBo inventoryBo : batchInventoriesBo.getInventories()) {
+//            // 检查数据库中是否已存在相同的 merchandiseId
+//            Inventories existingInventory = inventoriesMapper.selectByMerchandiseId(inventoryBo.getMerchandiseId());
+//
+//            if (existingInventory != null) {
+//                // 如果存在，更新数量
+//                System.out.println("xxxx: " + existingInventory.getNumber() + " + " + inventoryBo.getNumber());
+//                existingInventory.setNumber(existingInventory.getNumber() +
+//                        Integer.valueOf(inventoryBo.getNumber()));
+//                if (inventoryBo.getUnit() != null && !inventoryBo.getUnit().isEmpty()) {
+//                    existingInventory.setUnit(inventoryBo.getUnit());
+//                }
+//                if (inventoryBo.getRemark() != null && !inventoryBo.getRemark().isEmpty()) {
+//                    existingInventory.setRemark(inventoryBo.getRemark());
+//                }
+//                inventoriesMapper.updateInventoryById(existingInventory);
+//            } else {
+//                // 如果不存在，插入新纪录
+//                Inventories newInventory = MapstructUtils.convert(inventoryBo,
+//                        Inventories.class);
+//                inventoriesMapper.insert(newInventory);
+//            }
+//        }
     }
 }
