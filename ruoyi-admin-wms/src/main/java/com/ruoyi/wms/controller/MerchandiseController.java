@@ -83,6 +83,15 @@ public class MerchandiseController extends BaseController {
     }
 
     /**
+     * 获取库存可添加商品列表
+     */
+    @SaCheckPermission("wms:merchandise:list")
+    @GetMapping("/getAddableInventoryMerchandise")
+    public TableDataInfo<MerchandiseVo> queryAddableInventoryMerchandise(MerchandiseBo bo, PageQuery pageQuery) {
+        return merchandiseService.addableMerchandise(bo, pageQuery);
+    }
+
+    /**
      * 导出商品管理列表
      */
     @SaCheckPermission("wms:merchandise:export")

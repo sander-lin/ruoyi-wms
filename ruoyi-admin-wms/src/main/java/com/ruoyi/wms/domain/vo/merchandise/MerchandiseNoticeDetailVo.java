@@ -34,17 +34,17 @@ public class MerchandiseNoticeDetailVo extends MerchandiseVo {
      * 订单需求数量
      */
     @ExcelProperty(value = "订单需求数量")
-    private String quantityRequired;
+    private Integer quantityRequired;
 
     /**
      * 通知发货数量
      */
     @ExcelProperty(value = "通知发货数量")
-    private String quantityNotice;
+    private Integer quantityNotice;
 
     /**
      * 通知发货数量
      */
     @ExcelProperty(value = "总通知发货数量")
-    private String totalQuantityShipped;
+    private Integer totalQuantityShipped;
 }

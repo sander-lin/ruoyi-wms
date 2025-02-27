@@ -13,6 +13,7 @@ import lombok.EqualsAndHashCode;
 import jakarta.validation.constraints.*;
 import io.github.linpeilie.annotations.AutoMapper;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -58,7 +59,7 @@ public class ShipmentBo extends BaseEntity {
      */
     @NotBlank(message = "物流渠道不能为空", groups = { AddGroup.class })
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
 
     /**
      * 备注

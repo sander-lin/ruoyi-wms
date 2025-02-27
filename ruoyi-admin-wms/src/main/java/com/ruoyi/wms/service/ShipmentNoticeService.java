@@ -194,8 +194,8 @@ public class ShipmentNoticeService {
             .mapToInt(e-> Integer.parseInt(e.getQuantityNotice()))
             .sum();
 
-        if(merchandise.getQuantityNotice() > (compareQuantityRequired - compareQuantityNoticed))
-            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品通知发货数量不能超过需求数量！");
+//        if(merchandise.getQuantityNotice() > (compareQuantityRequired - compareQuantityNoticed))
+//            throw new RuntimeException(merchandise.getMerchandiseId() + " 该商品通知发货数量不能超过需求数量！");
     }
 
     private List<OrderMerchandiseVo> getOrderMerchandiseVos(NewShipmentNoticeBo bo) {

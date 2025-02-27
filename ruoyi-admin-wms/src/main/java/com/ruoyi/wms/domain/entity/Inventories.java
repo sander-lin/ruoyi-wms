@@ -7,6 +7,8 @@ import com.ruoyi.common.mybatis.core.domain.BaseEntity;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.time.LocalDateTime;
+import java.util.Date;
 
 /**
  * 商品库存表对象 inventory
@@ -31,10 +33,11 @@ public class Inventories implements Serializable {
      * 数量
      */
     private Integer number;
+
     /**
-     * 是否删除
+     * 入库时间
      */
-    private Boolean isDelete;
+    private LocalDateTime entryTime;
 
     /**
      * 商品id

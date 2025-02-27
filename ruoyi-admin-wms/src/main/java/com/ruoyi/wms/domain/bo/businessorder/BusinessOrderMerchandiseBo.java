@@ -1,5 +1,6 @@
  package com.ruoyi.wms.domain.bo.businessorder;
 
+ import com.fasterxml.jackson.annotation.JsonIgnore;
  import com.ruoyi.wms.domain.entity.OrderMerchandise;
  import com.ruoyi.common.core.validate.AddGroup;
  import com.ruoyi.common.core.validate.EditGroup;
@@ -32,7 +33,7 @@
      /**
       * 订单id
       */
-     @Null
+     @JsonIgnore
      private String orderId;
 
      /**
@@ -45,7 +46,7 @@
       * 需求数量
       */
      @NotBlank(message = "需求数量不能为空", groups = { AddGroup.class, EditGroup.class })
-     private String quantityRequired;
+     private Integer quantityRequired;
 
      /**
       * 选项

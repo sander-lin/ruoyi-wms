@@ -11,6 +11,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Wrappers;
 import com.ruoyi.common.satoken.utils.LoginHelper;
 import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderBo;
+import com.ruoyi.wms.domain.bo.businessorder.BusinessOrderMerchandiseBo;
 import com.ruoyi.wms.domain.bo.businessorder.NewOrderBo;
 import com.ruoyi.wms.domain.bo.businessorder.UpdateOrderStatusBo;
 import com.ruoyi.wms.domain.bo.financial.NewFinanceBo;
@@ -21,9 +22,11 @@ import com.ruoyi.wms.domain.entity.ShipmentNotice;
 import com.ruoyi.wms.domain.vo.OrderMerchandiseVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderDetailVo;
 import com.ruoyi.wms.domain.vo.businessorder.BusinessOrderVo;
+import com.ruoyi.wms.domain.vo.merchandise.MerchandiseVo;
 import com.ruoyi.wms.domain.vo.shipmentnotice.ShipmentNoticeVo;
 import com.ruoyi.wms.enums.FinancialState;
 import com.ruoyi.wms.enums.OrderStatus;
+import com.ruoyi.wms.mapper.MerchandiseMapper;
 import com.ruoyi.wms.mapper.OrderMerchandiseMapper;
 import com.ruoyi.wms.mapper.ShipmentNoticeMapper;
 import lombok.RequiredArgsConstructor;
@@ -52,6 +55,7 @@ public class BusinessOrderService {
     private final ShipmentNoticeMapper shipmentNoticeMapper;
     private final ShipmentNoticeService shipmentNoticeService;
     private final UserBalanceService userBalanceService;
+    private final MerchandiseMapper merchandiseMapper;
 
     /**
      * 查询订单表
@@ -137,12 +141,29 @@ public class BusinessOrderService {
             String userId = Objects.requireNonNull(LoginHelper.getUserId()).toString();
             bo.setUserId(userId);
         }
+        bo.setTotalAmount(calculateTotalAmount(bo.getMerchandises()));
         BusinessOrder businessOrder = MapstructUtils.convert(bo, BusinessOrder.class);
         businessOrderMapper.insert(businessOrder);
         bo.getMerchandises().forEach(merchandise -> {
             merchandise.setOrderId(businessOrder.getId());
             orderMerchandiseService.insertByBo(merchandise);
         });
+    }
+
+    /**
+     * 计算订单商品总额
+     */
+    private String calculateTotalAmount(List<BusinessOrderMerchandiseBo> ms) {
+        BigDecimal totalAmount = BigDecimal.ZERO;
+        List<MerchandiseVo> merchandiseVos = merchandiseMapper.selectVoBatchIds(ms.stream().map(BusinessOrderMerchandiseBo::getMerchandiseId).toList());
+        for (MerchandiseVo merchandiseVo : merchandiseVos) {
+             var temp = ms.stream().filter(m -> m.getMerchandiseId().equals(merchandiseVo.getId())).findFirst();
+             if(temp.isPresent()) {
+                 totalAmount = totalAmount.add(merchandiseVo.getPrice().multiply(BigDecimal.valueOf(temp.get().getQuantityRequired())));
+             }
+        }
+
+        return String.valueOf(totalAmount);
     }
 
     /**
@@ -231,7 +252,9 @@ public class BusinessOrderService {
             }
         });
 
-        orderMerchandiseMapper.deleteBatchIds(existingMerchandiseIds.values());
+        if(!existingMerchandiseIds.values().isEmpty()) {
+            orderMerchandiseMapper.deleteBatchIds(existingMerchandiseIds.values());
+        }
     }
 
     /**

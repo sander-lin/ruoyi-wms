@@ -12,6 +12,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class ShipmentDetailVo extends BaseVo {
      */
     @ExcelProperty(value = "发货时间")
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    private Date deliveryTime;
+    private LocalDateTime deliveryTime;
 
     /**
      * 商品信息

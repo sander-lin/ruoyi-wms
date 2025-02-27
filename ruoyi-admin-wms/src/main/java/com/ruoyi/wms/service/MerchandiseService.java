@@ -89,6 +89,16 @@ public class MerchandiseService {
     }
 
     /**
+     * 获取可新增库存商品列表
+     */
+    public TableDataInfo<MerchandiseVo> addableMerchandise(MerchandiseBo bo, PageQuery pageQuery) {
+        bo.setIsConfirmed(true);
+        LambdaQueryWrapper<Merchandise> lqw = buildQueryWrapper(bo);
+        Page<MerchandiseVo> result = merchandiseMapper.queryAddableMerchandiseList(pageQuery.build(), lqw);
+        return TableDataInfo.build(result);
+    }
+
+    /**
      * 查询商品管理列表
      */
     @DataPermission({

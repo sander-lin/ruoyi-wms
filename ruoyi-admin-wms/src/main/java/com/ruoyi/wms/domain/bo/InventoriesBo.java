@@ -1,8 +1,10 @@
 package com.ruoyi.wms.domain.bo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.wms.domain.entity.Inventories;
 
 import java.io.Serializable;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,14 +45,21 @@ public class InventoriesBo implements Serializable {
     /**
      * 商品id
      */
-    @NotBlank(message = "商品id不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "商品id不能为空", groups = { AddGroup.class })
     private String merchandiseId;
 
     /**
      * 单位
      */
-    @NotBlank(message = "单位不能为空", groups = { AddGroup.class, EditGroup.class })
+    @NotBlank(message = "单位不能为空", groups = { AddGroup.class })
     private String unit;
+
+    /**
+     * 入库时间
+     */
+    @NotBlank(message = "入库时间不能为空", groups = { AddGroup.class })
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
+    private LocalDateTime entryTime;
 
     /**
      * 备注
